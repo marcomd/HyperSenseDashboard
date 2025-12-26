@@ -1,0 +1,131 @@
+import { RefreshCw, AlertCircle } from 'lucide-react';
+import clsx from 'clsx';
+import {
+  Header,
+  AccountSummary,
+  PositionsTable,
+  MacroStrategyCard,
+  DecisionLog,
+  MarketOverview,
+  SystemStatus,
+  EquityCurve,
+} from '@/components';
+import { useDashboard, usePerformance } from '@/hooks/useApi';
+
+export function Dashboard() {
+  const {
+    data: dashboardData,
+    isLoading,
+    error,
+    refetch,
+    wsConnected,
+  } = useDashboard();
+
+  const { data: performanceData, isLoading: perfLoading } = usePerformance(30);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 text-accent animate-spin mx-auto mb-4" />
+          <div className="text-slate-400">Loading dashboard...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !dashboardData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-4" />
+          <div className="text-white mb-2">Failed to load dashboard</div>
+          <div className="text-slate-400 text-sm mb-4">
+            {error?.message || 'Unknown error'}
+          </div>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const { account, positions, market, macro_strategy, recent_decisions, system_status } =
+    dashboardData;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header
+        wsConnected={wsConnected}
+        paperTrading={account.paper_trading}
+        tradingAllowed={account.circuit_breaker.trading_allowed}
+      />
+
+      <main className="flex-1 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Top Row: Account Summary */}
+          <AccountSummary account={account} />
+
+          {/* Market Overview */}
+          <MarketOverview market={market} />
+
+          {/* Main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Positions & Performance */}
+            <div className="lg:col-span-2 space-y-6">
+              <PositionsTable positions={positions} />
+              <EquityCurve data={performanceData} isLoading={perfLoading} />
+            </div>
+
+            {/* Right Column: Strategy, Decisions, Status */}
+            <div className="space-y-6">
+              <MacroStrategyCard strategy={macro_strategy} />
+              <DecisionLog decisions={recent_decisions} />
+              <SystemStatus status={system_status} />
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-bg-secondary border-t border-slate-700/50 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-sm text-slate-400">
+          <div className="flex items-center gap-3">
+            <span>HyperSense</span>
+            <span className="text-slate-500">|</span>
+            <span>Backend v0.8.0</span>
+            <span className="text-slate-500">|</span>
+            <span>Frontend v0.1.0</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span
+              className={clsx(
+                'flex items-center gap-1',
+                wsConnected ? 'text-green-400' : 'text-red-400'
+              )}
+            >
+              <span
+                className={clsx(
+                  'w-2 h-2 rounded-full',
+                  wsConnected ? 'bg-green-400' : 'bg-red-400'
+                )}
+              />
+              {wsConnected ? 'Real-time' : 'Offline'}
+            </span>
+            <button
+              onClick={() => refetch()}
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
