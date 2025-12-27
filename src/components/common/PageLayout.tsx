@@ -15,7 +15,7 @@ export function PageLayout({ title, subtitle, children }: PageLayoutProps) {
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
       <Header
-        wsConnected={false}
+        wsStatus="not-needed"
         paperTrading={healthData?.environment !== 'production'}
         tradingAllowed={true}
       />

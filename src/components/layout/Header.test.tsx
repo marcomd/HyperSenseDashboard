@@ -43,6 +43,26 @@ describe('Header', () => {
       render(<Header wsConnected={false} paperTrading={false} tradingAllowed={true} />)
       expect(screen.getByText('Disconnected')).toBeInTheDocument()
     })
+
+    it('shows Connected when wsStatus is connected', () => {
+      render(<Header wsStatus="connected" paperTrading={false} tradingAllowed={true} />)
+      expect(screen.getByText('Connected')).toBeInTheDocument()
+    })
+
+    it('shows Disconnected when wsStatus is disconnected', () => {
+      render(<Header wsStatus="disconnected" paperTrading={false} tradingAllowed={true} />)
+      expect(screen.getByText('Disconnected')).toBeInTheDocument()
+    })
+
+    it('shows No realtime when wsStatus is not-needed', () => {
+      render(<Header wsStatus="not-needed" paperTrading={false} tradingAllowed={true} />)
+      expect(screen.getByText('No realtime')).toBeInTheDocument()
+    })
+
+    it('prefers wsStatus over wsConnected when both provided', () => {
+      render(<Header wsConnected={true} wsStatus="not-needed" paperTrading={false} tradingAllowed={true} />)
+      expect(screen.getByText('No realtime')).toBeInTheDocument()
+    })
   })
 
   describe('Navigation', () => {

@@ -5,6 +5,30 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2025-12-27
+
+### Added
+
+- **Favicon** - Custom Activity icon favicon matching the header branding
+- **"How the UI Works" Documentation** - New README section explaining:
+  - Page types (Dashboard vs Detail pages)
+  - Header indicators (Paper Trading, Trading Status, Connection Status)
+  - Circuit breaker / Trading Active explanation
+
+### Changed
+
+- **WebSocket Status Indicator** - Now supports three states:
+  - `Connected` (green) - WebSocket active, receiving real-time updates
+  - `Disconnected` (red) - WebSocket connection failed
+  - `No realtime` (orange) - Page intentionally doesn't use WebSocket
+- **Detail Pages** - Now show "No realtime" in orange instead of "Disconnected" in red
+- **Page Title** - Changed from "frontend" to "HyperSense"
+
+### Technical Details
+
+- 290 tests across 23 test files
+- Header component accepts new `wsStatus` prop with backward compatibility for `wsConnected`
+
 ## [0.2.0] - 2025-12-26
 
 ### Added

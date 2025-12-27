@@ -13,6 +13,15 @@ describe('PageLayout', () => {
       expect(screen.getByText('Test Page')).toBeInTheDocument()
     })
 
+    it('shows No realtime status in header', () => {
+      render(
+        <PageLayout title="Test Page">
+          <div>Content</div>
+        </PageLayout>
+      )
+      expect(screen.getByText('No realtime')).toBeInTheDocument()
+    })
+
     it('renders children content', () => {
       render(
         <PageLayout title="Test Page">

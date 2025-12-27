@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.2.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.3.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 
@@ -129,6 +129,62 @@ src/
 | ------------ | ----------------------------------------------------------------- |
 | `DataTable`  | Generic table with loading skeleton, empty state, expandable rows |
 | `PageLayout` | Page wrapper with title, subtitle, back-to-dashboard link         |
+
+## How the UI Works
+
+### Page Types
+
+The application has two types of pages with different data fetching strategies:
+
+| Page Type        | Example Pages                                      | Data Strategy               |
+| ---------------- | -------------------------------------------------- | --------------------------- |
+| **Dashboard**    | `/` (Dashboard)                                    | Real-time WebSocket updates |
+| **Detail Pages** | Decisions, Strategies, Forecasts, Market Snapshots | REST API with pagination    |
+
+### Dashboard (Real-time)
+
+The main Dashboard page connects to the backend via WebSocket (ActionCable) and receives live updates for:
+- Market prices and indicators
+- Position changes (opened, closed, updated)
+- New trading decisions
+- Macro strategy updates
+
+This allows traders to monitor the system in real-time without refreshing.
+
+### Detail Pages (Historical Data)
+
+Detail pages display historical, paginated data fetched via REST API. They include filters (date range, symbol, status) and pagination controls. These pages **intentionally do not use WebSocket** because:
+- They show historical data that doesn't change in real-time
+- Pagination and filters make real-time updates impractical
+- React Query handles data caching and optional polling
+
+### Header Indicators
+
+The header displays three status indicators:
+
+| Indicator             | States                                                        | Description                                                            |
+| --------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Paper Trading**     | Yellow badge (shown/hidden)                                   | Indicates sandbox mode when environment is not production              |
+| **Trading Status**    | Green "Trading Active" / Red "Trading Halted"                 | Reflects circuit breaker state - whether the system can execute trades |
+| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "No realtime" | WebSocket connection state                                             |
+
+#### Connection Status Explained
+
+- **Connected** (green): WebSocket is active, receiving real-time updates (Dashboard only)
+- **Disconnected** (red): WebSocket connection failed or dropped (Dashboard only)
+- **No realtime** (orange): Page intentionally doesn't use WebSocket (Detail pages)
+
+#### Trading Status Explained
+
+The "Trading Active/Halted" indicator reflects the **circuit breaker** state from the backend:
+
+- **Trading Active** (green): The trading engine is allowed to execute trades
+- **Trading Halted** (red): The circuit breaker has stopped trading due to:
+  - Maximum drawdown exceeded
+  - Position limits violated
+  - Other risk conditions met
+
+The circuit breaker is a safety mechanism that automatically halts trading when risk thresholds are breached.
 
 ## Routing
 

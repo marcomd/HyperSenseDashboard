@@ -2,8 +2,11 @@ import { Activity, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 
+type WsStatus = 'connected' | 'disconnected' | 'not-needed';
+
 interface HeaderProps {
-  wsConnected: boolean;
+  wsConnected?: boolean;
+  wsStatus?: WsStatus;
   paperTrading: boolean;
   tradingAllowed: boolean;
 }
@@ -16,8 +19,11 @@ const NAV_LINKS = [
   { to: '/market-snapshots', label: 'Snapshots' },
 ];
 
-export function Header({ wsConnected, paperTrading, tradingAllowed }: HeaderProps) {
+export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: HeaderProps) {
   const location = useLocation();
+
+  // Derive effective status: prefer explicit wsStatus, otherwise derive from boolean
+  const effectiveStatus: WsStatus = wsStatus ?? (wsConnected ? 'connected' : 'disconnected');
 
   return (
     <header className="bg-bg-secondary border-b border-slate-700/50">
@@ -59,16 +65,20 @@ export function Header({ wsConnected, paperTrading, tradingAllowed }: HeaderProp
           <div
             className={clsx(
               'flex items-center gap-1 text-sm',
-              wsConnected ? 'text-green-400' : 'text-red-400'
+              effectiveStatus === 'connected' && 'text-green-400',
+              effectiveStatus === 'disconnected' && 'text-red-400',
+              effectiveStatus === 'not-needed' && 'text-orange-400'
             )}
           >
-            {wsConnected ? (
+            {effectiveStatus === 'connected' ? (
               <Wifi className="w-4 h-4" />
             ) : (
               <WifiOff className="w-4 h-4" />
             )}
             <span className="hidden sm:inline">
-              {wsConnected ? 'Connected' : 'Disconnected'}
+              {effectiveStatus === 'connected' && 'Connected'}
+              {effectiveStatus === 'disconnected' && 'Disconnected'}
+              {effectiveStatus === 'not-needed' && 'No realtime'}
             </span>
           </div>
         </div>
