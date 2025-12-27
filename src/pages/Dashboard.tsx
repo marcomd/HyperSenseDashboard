@@ -10,7 +10,10 @@ import {
   SystemStatus,
   EquityCurve,
 } from '@/components';
-import { useDashboard, usePerformance } from '@/hooks/useApi';
+import { useDashboard, usePerformance, useHealth } from '@/hooks/useApi';
+
+// Frontend version from Vite build
+const FRONTEND_VERSION = __APP_VERSION__;
 
 export function Dashboard() {
   const {
@@ -22,6 +25,10 @@ export function Dashboard() {
   } = useDashboard();
 
   const { data: performanceData, isLoading: perfLoading } = usePerformance(30);
+  const { data: healthData } = useHealth();
+
+  const backendVersion = healthData?.version ?? '...';
+  const backendEnv = healthData?.environment;
 
   if (isLoading) {
     return (
@@ -97,9 +104,15 @@ export function Dashboard() {
           <div className="flex items-center gap-3">
             <span>HyperSense</span>
             <span className="text-slate-500">|</span>
-            <span>Backend v0.8.0</span>
+            <span>Backend v{backendVersion}</span>
+            {backendEnv && backendEnv !== 'production' && (
+              <>
+                <span className="text-slate-500">|</span>
+                <span className="text-yellow-500">{backendEnv}</span>
+              </>
+            )}
             <span className="text-slate-500">|</span>
-            <span>Frontend v0.1.0</span>
+            <span>Frontend v{FRONTEND_VERSION}</span>
           </div>
           <div className="flex items-center gap-4">
             <span

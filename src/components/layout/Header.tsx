@@ -1,4 +1,5 @@
 import { Activity, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 
 interface HeaderProps {
@@ -7,16 +8,26 @@ interface HeaderProps {
   tradingAllowed: boolean;
 }
 
+const NAV_LINKS = [
+  { to: '/', label: 'Dashboard' },
+  { to: '/decisions', label: 'Decisions' },
+  { to: '/macro-strategies', label: 'Strategies' },
+  { to: '/forecasts', label: 'Forecasts' },
+  { to: '/market-snapshots', label: 'Snapshots' },
+];
+
 export function Header({ wsConnected, paperTrading, tradingAllowed }: HeaderProps) {
+  const location = useLocation();
+
   return (
-    <header className="bg-bg-secondary border-b border-slate-700/50 px-6 py-4">
-      <div className="flex items-center justify-between">
+    <header className="bg-bg-secondary border-b border-slate-700/50">
+      <div className="px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Activity className="w-8 h-8 text-accent" />
             <h1 className="text-xl font-bold text-white">HyperSense</h1>
-          </div>
-          <span className="text-sm text-slate-400">Autonomous Trading Agent</span>
+          </Link>
+          <span className="text-sm text-slate-400 hidden sm:inline">Autonomous Trading Agent</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -62,6 +73,29 @@ export function Header({ wsConnected, paperTrading, tradingAllowed }: HeaderProp
           </div>
         </div>
       </div>
+
+      {/* Navigation Bar */}
+      <nav className="px-6 py-2 border-t border-slate-700/30 bg-bg-secondary/50">
+        <div className="flex items-center gap-1">
+          {NAV_LINKS.map((link) => {
+            const isActive = location.pathname === link.to;
+            return (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={clsx(
+                  'px-3 py-1.5 text-sm rounded transition-colors',
+                  isActive
+                    ? 'bg-accent/20 text-accent font-medium'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </header>
   );
 }

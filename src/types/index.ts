@@ -185,3 +185,71 @@ export interface PaginatedResponse<T> {
   data: T[];
   meta: PaginationMeta;
 }
+
+// Filter Parameters
+export interface ListFilterParams {
+  startDate?: string;
+  endDate?: string;
+  symbol?: string;
+  status?: string;
+  operation?: string;
+  search?: string;
+  page?: number;
+  per_page?: number;
+}
+
+// Market Snapshot for list view
+export interface MarketSnapshot {
+  id: number;
+  symbol: string;
+  price: number;
+  indicators: {
+    rsi_14?: number;
+    ema_20?: number;
+    ema_50?: number;
+    ema_100?: number;
+    macd?: {
+      value: number;
+      signal: number;
+      histogram: number;
+    };
+    pivot_points?: Record<string, number>;
+  };
+  sentiment?: Record<string, unknown> | null;
+  captured_at: string;
+}
+
+// Extended Forecast for list view
+export interface ForecastListItem {
+  id: number;
+  symbol: string;
+  timeframe: string;
+  current_price: number;
+  predicted_price: number;
+  direction: Bias;
+  change_pct: number;
+  forecast_for: string;
+  actual_price?: number | null;
+  mae?: number | null;
+  mape?: number | null;
+  created_at: string;
+}
+
+// Extended Trading Decision with full context
+export interface TradingDecisionDetail extends TradingDecision {
+  target_position?: number | null;
+  context_sent?: Record<string, unknown>;
+  llm_response?: Record<string, unknown>;
+  parsed_decision?: Record<string, unknown>;
+  macro_strategy?: {
+    id: number;
+    bias: Bias;
+    risk_tolerance: number;
+  } | null;
+}
+
+// Extended Macro Strategy with full context
+export interface MacroStrategyDetail extends MacroStrategy {
+  context_used?: Record<string, unknown>;
+  llm_response?: Record<string, unknown>;
+}

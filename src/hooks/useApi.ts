@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { api } from '@/api/client';
+import type { HealthResponse } from '@/api/client';
 import { useDashboardChannel } from './useWebSocket';
 import type {
   DashboardData,
@@ -10,8 +11,11 @@ import type {
   MarketOverview,
 } from '@/types';
 
+import type { ListFilterParams } from '@/types';
+
 // Query keys
 export const queryKeys = {
+  health: ['health'] as const,
   dashboard: ['dashboard'] as const,
   positions: {
     all: ['positions'] as const,
@@ -21,6 +25,7 @@ export const queryKeys = {
   },
   decisions: {
     all: ['decisions'] as const,
+    list: (params?: ListFilterParams) => ['decisions', 'list', params] as const,
     recent: (limit?: number) => ['decisions', 'recent', limit] as const,
     byId: (id: number) => ['decisions', id] as const,
     stats: (hours?: number) => ['decisions', 'stats', hours] as const,
@@ -32,12 +37,29 @@ export const queryKeys = {
       ['marketData', symbol, 'history', hours, interval] as const,
     forecasts: ['marketData', 'forecasts'] as const,
   },
+  marketSnapshots: {
+    list: (params?: ListFilterParams) => ['marketSnapshots', 'list', params] as const,
+  },
+  forecasts: {
+    list: (params?: ListFilterParams & { timeframe?: string }) => ['forecasts', 'list', params] as const,
+  },
   macroStrategy: {
     current: ['macroStrategy', 'current'] as const,
     all: ['macroStrategy'] as const,
+    list: (params?: ListFilterParams) => ['macroStrategy', 'list', params] as const,
     byId: (id: number) => ['macroStrategy', id] as const,
   },
 };
+
+// Health hook - fetches backend version info
+export function useHealth() {
+  return useQuery<HealthResponse>({
+    queryKey: queryKeys.health,
+    queryFn: api.health.getHealth,
+    staleTime: 60000, // Consider fresh for 1 minute
+    retry: 2,
+  });
+}
 
 // Dashboard hook with real-time updates
 export function useDashboard() {
@@ -217,5 +239,34 @@ export function useMacroStrategies(params?: Parameters<typeof api.macroStrategie
   return useQuery({
     queryKey: [...queryKeys.macroStrategy.all, params],
     queryFn: () => api.macroStrategies.getAll(params),
+  });
+}
+
+// List hooks for detail pages
+export function useDecisionsList(params?: ListFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.decisions.list(params),
+    queryFn: () => api.decisions.getAll(params),
+  });
+}
+
+export function useMacroStrategiesList(params?: ListFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.macroStrategy.list(params),
+    queryFn: () => api.macroStrategies.getAll(params),
+  });
+}
+
+export function useMarketSnapshotsList(params?: ListFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.marketSnapshots.list(params),
+    queryFn: () => api.marketSnapshots.getAll(params),
+  });
+}
+
+export function useForecastsList(params?: ListFilterParams & { timeframe?: string }) {
+  return useQuery({
+    queryKey: queryKeys.forecasts.list(params),
+    queryFn: () => api.forecasts.getAll(params),
   });
 }

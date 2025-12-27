@@ -7,9 +7,22 @@ import type {
   PerformanceData,
   OHLCData,
   PaginationMeta,
+  ListFilterParams,
+  MarketSnapshot,
+  ForecastListItem,
 } from '@/types';
 
 const API_BASE = '/api/v1';
+
+// Health check response type
+export interface HealthResponse {
+  status: string;
+  version: string;
+  ruby_version: string;
+  rails_version: string;
+  environment: string;
+  timestamp: string;
+}
 
 // Generic fetch wrapper with error handling
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -28,6 +41,11 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
   return response.json();
 }
+
+// Health API
+export const healthApi = {
+  getHealth: () => fetchApi<HealthResponse>('/health'),
+};
 
 // Dashboard API
 export const dashboardApi = {
@@ -68,24 +86,28 @@ export const positionsApi = {
     fetchApi<PerformanceData>(`/positions/performance${days ? `?days=${days}` : ''}`),
 };
 
+// Helper to build search params from filter object
+function buildFilterParams(params?: ListFilterParams): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  if (params.startDate) searchParams.set('start_date', params.startDate);
+  if (params.endDate) searchParams.set('end_date', params.endDate);
+  if (params.symbol) searchParams.set('symbol', params.symbol);
+  if (params.status) searchParams.set('status', params.status);
+  if (params.operation) searchParams.set('operation', params.operation);
+  if (params.search) searchParams.set('search', params.search);
+  if (params.page) searchParams.set('page', params.page.toString());
+  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
+}
+
 // Decisions API
 export const decisionsApi = {
-  getAll: (params?: {
-    status?: string;
-    symbol?: string;
-    operation?: string;
-    page?: number;
-    per_page?: number;
-  }) => {
-    const searchParams = new URLSearchParams();
-    if (params?.status) searchParams.set('status', params.status);
-    if (params?.symbol) searchParams.set('symbol', params.symbol);
-    if (params?.operation) searchParams.set('operation', params.operation);
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
-    const query = searchParams.toString();
+  getAll: (params?: ListFilterParams) => {
+    const query = buildFilterParams(params);
     return fetchApi<{ decisions: TradingDecision[]; meta: PaginationMeta }>(
-      `/decisions${query ? `?${query}` : ''}`
+      `/decisions${query}`
     );
   },
 
@@ -157,13 +179,10 @@ export const marketDataApi = {
 
 // Macro Strategies API
 export const macroStrategiesApi = {
-  getAll: (params?: { page?: number; per_page?: number }) => {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.set('page', params.page.toString());
-    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
-    const query = searchParams.toString();
+  getAll: (params?: ListFilterParams) => {
+    const query = buildFilterParams(params);
     return fetchApi<{ strategies: MacroStrategy[]; meta: PaginationMeta }>(
-      `/macro_strategies${query ? `?${query}` : ''}`
+      `/macro_strategies${query}`
     );
   },
 
@@ -176,13 +195,43 @@ export const macroStrategiesApi = {
     fetchApi<{ strategy: MacroStrategy }>(`/macro_strategies/${id}`),
 };
 
+// Market Snapshots API (for list views)
+export const marketSnapshotsApi = {
+  getAll: (params?: ListFilterParams) => {
+    const query = buildFilterParams(params);
+    return fetchApi<{ snapshots: MarketSnapshot[]; meta: PaginationMeta }>(
+      `/market_data/snapshots${query}`
+    );
+  },
+};
+
+// Forecasts API (for list views)
+export const forecastsApi = {
+  getAll: (params?: ListFilterParams & { timeframe?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.startDate) searchParams.set('start_date', params.startDate);
+    if (params?.endDate) searchParams.set('end_date', params.endDate);
+    if (params?.symbol) searchParams.set('symbol', params.symbol);
+    if (params?.timeframe) searchParams.set('timeframe', params.timeframe);
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
+    const query = searchParams.toString();
+    return fetchApi<{ forecasts: ForecastListItem[]; meta: PaginationMeta }>(
+      `/market_data/forecasts${query ? `?${query}` : ''}`
+    );
+  },
+};
+
 // Export all APIs
 export const api = {
+  health: healthApi,
   dashboard: dashboardApi,
   positions: positionsApi,
   decisions: decisionsApi,
   marketData: marketDataApi,
   macroStrategies: macroStrategiesApi,
+  marketSnapshots: marketSnapshotsApi,
+  forecasts: forecastsApi,
 };
 
 export default api;

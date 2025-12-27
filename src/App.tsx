@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Dashboard } from '@/pages/Dashboard';
+import { ForecastsPage } from '@/pages/ForecastsPage';
+import { MarketSnapshotsPage } from '@/pages/MarketSnapshotsPage';
+import { MacroStrategiesPage } from '@/pages/MacroStrategiesPage';
+import { DecisionsPage } from '@/pages/DecisionsPage';
+import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,10 +17,25 @@ const queryClient = new QueryClient({
   },
 });
 
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/forecasts" element={<ForecastsPage />} />
+      <Route path="/market-snapshots" element={<MarketSnapshotsPage />} />
+      <Route path="/macro-strategies" element={<MacroStrategiesPage />} />
+      <Route path="/decisions" element={<DecisionsPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Dashboard />
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }

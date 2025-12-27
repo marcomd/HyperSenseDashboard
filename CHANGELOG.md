@@ -5,6 +5,57 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-12-26
+
+### Added
+
+- **React Router** - Client-side routing with `react-router-dom`
+  - Routes: `/`, `/forecasts`, `/market-snapshots`, `/macro-strategies`, `/decisions`
+  - 404 handling with NotFoundPage
+  - Active route highlighting in navigation
+
+- **Detail Pages** - Full-featured list views with filters and pagination
+  - `ForecastsPage` - Price forecasts with symbol, timeframe, date filters
+  - `MarketSnapshotsPage` - Market snapshots with RSI/MACD signals, expandable indicators
+  - `MacroStrategiesPage` - Strategy history with bias filter, expandable narrative
+  - `DecisionsPage` - Trading decisions with status, operation, symbol filters
+
+- **Filter Components** - Reusable filter UI components
+  - `DateRangeFilter` - Date range with 24h, 7d, 30d presets
+  - `SymbolFilter` - Dropdown for BTC, ETH, SOL, BNB
+  - `StatusFilter` - Generic status/bias/operation dropdown
+  - `SearchFilter` - Debounced text search (300ms)
+  - `Pagination` - Page navigation with size selector
+  - `FilterBar` - Composite filter bar component
+
+- **Common Components**
+  - `DataTable` - Generic table with loading skeleton, empty state, expandable rows
+  - `PageLayout` - Page wrapper with Header navigation and back link
+
+- **Custom Hooks**
+  - `useFilters` - Filter state management with URL sync
+  - `usePagination` - Pagination state with URL sync
+
+- **API Extensions**
+  - `marketSnapshotsApi.getAll()` - Fetch paginated snapshots
+  - `forecastsApi.getAll()` - Fetch paginated forecasts
+  - `useMarketSnapshotsList`, `useForecastsList` - React Query hooks for list views
+
+- **Test Factories**
+  - `createMarketSnapshot()` - Market snapshot factory
+  - `createForecastListItem()` - Forecast list item factory
+
+### Changed
+
+- `Header` - Added navigation links to all pages with active state
+- `PageLayout` - Now includes Header for consistent navigation across all pages
+
+### Technical Details
+
+- 285 tests across 23 test files
+- MSW handlers updated for new endpoints
+- URL-synced filter state for shareable URLs
+
 ## [0.1.0] - 2025-12-26
 
 ### Added
