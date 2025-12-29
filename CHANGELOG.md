@@ -5,6 +5,25 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-12-29
+
+### Added
+- **Execution Logs Page** - New page to view and filter execution logs
+  - `ExecutionLogsPage` - Page with DataTable, expandable rows, and filters
+  - `executionLogsApi` - API client methods for execution logs
+  - `useExecutionLogsList`, `useExecutionLogsStats` - React Query hooks
+  - Navigation link "Exec Logs" added to header
+  - Route `/execution-logs` added
+- **E2E Navigation Tests** - Comprehensive Playwright tests for all routes
+  - `e2e/navigation.spec.ts` - Tests navigation to all pages
+  - Verifies all nav links are visible
+  - Tests filter components on detail pages
+
+### Fixed
+- **MarketOverview toFixed Error** - Fixed crash when `forecast_change_pct` is a string
+  - Added `Number()` conversion for type safety
+  - Changed `!== null` to `!= null` to also catch undefined
+
 ## [0.3.0] - 2025-12-27
 
 ### Added

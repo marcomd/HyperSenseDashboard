@@ -10,6 +10,8 @@ import type {
   ListFilterParams,
   MarketSnapshot,
   ForecastListItem,
+  ExecutionLog,
+  ExecutionLogsStats,
 } from '@/types';
 
 const API_BASE = '/api/v1';
@@ -222,6 +224,40 @@ export const forecastsApi = {
   },
 };
 
+// Helper to build execution logs filter params (uses 'log_action' to avoid Rails reserved param)
+function buildExecutionLogsFilterParams(params?: ListFilterParams): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  if (params.startDate) searchParams.set('start_date', params.startDate);
+  if (params.endDate) searchParams.set('end_date', params.endDate);
+  if (params.status) searchParams.set('status', params.status);
+  // Use 'operation' field from ListFilterParams as 'log_action' for execution logs
+  // (can't use 'action' as it's a reserved Rails param)
+  if (params.operation) searchParams.set('log_action', params.operation);
+  if (params.page) searchParams.set('page', params.page.toString());
+  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
+}
+
+// Execution Logs API
+export const executionLogsApi = {
+  getAll: (params?: ListFilterParams) => {
+    const query = buildExecutionLogsFilterParams(params);
+    return fetchApi<{ execution_logs: ExecutionLog[]; meta: PaginationMeta }>(
+      `/execution_logs${query}`
+    );
+  },
+
+  getById: (id: number) =>
+    fetchApi<{ execution_log: ExecutionLog }>(`/execution_logs/${id}`),
+
+  getStats: (hours?: number) =>
+    fetchApi<ExecutionLogsStats>(
+      `/execution_logs/stats${hours ? `?hours=${hours}` : ''}`
+    ),
+};
+
 // Export all APIs
 export const api = {
   health: healthApi,
@@ -232,6 +268,7 @@ export const api = {
   macroStrategies: macroStrategiesApi,
   marketSnapshots: marketSnapshotsApi,
   forecasts: forecastsApi,
+  executionLogs: executionLogsApi,
 };
 
 export default api;

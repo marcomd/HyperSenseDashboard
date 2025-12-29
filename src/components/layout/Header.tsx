@@ -17,6 +17,7 @@ const NAV_LINKS = [
   { to: '/macro-strategies', label: 'Strategies' },
   { to: '/forecasts', label: 'Forecasts' },
   { to: '/market-snapshots', label: 'Snapshots' },
+  { to: '/execution-logs', label: 'Exec Logs' },
 ];
 
 export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: HeaderProps) {

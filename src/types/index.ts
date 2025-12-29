@@ -253,3 +253,36 @@ export interface MacroStrategyDetail extends MacroStrategy {
   context_used?: Record<string, unknown>;
   llm_response?: Record<string, unknown>;
 }
+
+// Execution Log
+export type ExecutionLogStatus = 'success' | 'failure';
+export type ExecutionLogAction =
+  | 'place_order'
+  | 'cancel_order'
+  | 'modify_order'
+  | 'sync_position'
+  | 'sync_account'
+  | 'risk_trigger';
+
+export interface ExecutionLog {
+  id: number;
+  action: ExecutionLogAction;
+  status: ExecutionLogStatus;
+  executed_at: string;
+  created_at: string;
+  loggable_type: string | null;
+  loggable_id: number | null;
+  // Detailed fields (only in show response)
+  request_payload?: Record<string, unknown>;
+  response_payload?: Record<string, unknown>;
+  error_message?: string | null;
+  duration_ms?: number | null;
+}
+
+export interface ExecutionLogsStats {
+  period_hours: number;
+  total_logs: number;
+  by_status: Record<string, number>;
+  by_action: Record<string, number>;
+  success_rate: number;
+}

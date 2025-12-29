@@ -43,6 +43,12 @@ export const queryKeys = {
   forecasts: {
     list: (params?: ListFilterParams & { timeframe?: string }) => ['forecasts', 'list', params] as const,
   },
+  executionLogs: {
+    all: ['executionLogs'] as const,
+    list: (params?: ListFilterParams) => ['executionLogs', 'list', params] as const,
+    byId: (id: number) => ['executionLogs', id] as const,
+    stats: (hours?: number) => ['executionLogs', 'stats', hours] as const,
+  },
   macroStrategy: {
     current: ['macroStrategy', 'current'] as const,
     all: ['macroStrategy'] as const,
@@ -268,5 +274,28 @@ export function useForecastsList(params?: ListFilterParams & { timeframe?: strin
   return useQuery({
     queryKey: queryKeys.forecasts.list(params),
     queryFn: () => api.forecasts.getAll(params),
+  });
+}
+
+// Execution logs hooks
+export function useExecutionLogsList(params?: ListFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.executionLogs.list(params),
+    queryFn: () => api.executionLogs.getAll(params),
+  });
+}
+
+export function useExecutionLog(id: number) {
+  return useQuery({
+    queryKey: queryKeys.executionLogs.byId(id),
+    queryFn: () => api.executionLogs.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useExecutionLogsStats(hours = 24) {
+  return useQuery({
+    queryKey: queryKeys.executionLogs.stats(hours),
+    queryFn: () => api.executionLogs.getStats(hours),
   });
 }

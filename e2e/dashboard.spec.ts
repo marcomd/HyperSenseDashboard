@@ -6,7 +6,7 @@ test.describe('Dashboard', () => {
 
     // Wait for the dashboard to load (either content or loading state)
     await expect(
-      page.getByText('HyperSense').or(page.getByText('Loading'))
+      page.getByRole('heading', { name: 'HyperSense' }).or(page.getByText('Loading'))
     ).toBeVisible({ timeout: 10000 })
 
     // If loading, wait for it to complete
@@ -16,7 +16,7 @@ test.describe('Dashboard', () => {
     }
 
     // Verify main header is visible
-    await expect(page.getByText('HyperSense')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'HyperSense' })).toBeVisible()
     await expect(page.getByText('Autonomous Trading Agent')).toBeVisible()
   })
 
@@ -44,7 +44,7 @@ test.describe('Dashboard', () => {
     await page.goto('/')
 
     // Wait for page to load
-    await expect(page.getByText('HyperSense')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('heading', { name: 'HyperSense' })).toBeVisible({ timeout: 10000 })
 
     // Check for connection status (Connected or Disconnected)
     const connectionStatus = page

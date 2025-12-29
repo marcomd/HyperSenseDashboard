@@ -134,12 +134,12 @@ function AssetCard({ symbol, data }: { symbol: string; data: MarketOverviewType 
         </div>
 
         {/* Forecast */}
-        {data.forecast_change_pct !== null && (
+        {data.forecast_change_pct != null && (
           <div className="flex items-center justify-between pt-2 border-t border-slate-700/50">
             <span className="text-slate-400">1h Forecast</span>
             <span className={forecastColor}>
-              {data.forecast_change_pct >= 0 ? '+' : ''}
-              {data.forecast_change_pct.toFixed(2)}%
+              {Number(data.forecast_change_pct) >= 0 ? '+' : ''}
+              {Number(data.forecast_change_pct).toFixed(2)}%
             </span>
           </div>
         )}

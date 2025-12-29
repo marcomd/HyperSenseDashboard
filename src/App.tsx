@@ -5,6 +5,7 @@ import { ForecastsPage } from '@/pages/ForecastsPage';
 import { MarketSnapshotsPage } from '@/pages/MarketSnapshotsPage';
 import { MacroStrategiesPage } from '@/pages/MacroStrategiesPage';
 import { DecisionsPage } from '@/pages/DecisionsPage';
+import { ExecutionLogsPage } from '@/pages/ExecutionLogsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -25,6 +26,7 @@ export function AppRoutes() {
       <Route path="/market-snapshots" element={<MarketSnapshotsPage />} />
       <Route path="/macro-strategies" element={<MacroStrategiesPage />} />
       <Route path="/decisions" element={<DecisionsPage />} />
+      <Route path="/execution-logs" element={<ExecutionLogsPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
