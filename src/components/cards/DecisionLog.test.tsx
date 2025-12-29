@@ -86,6 +86,19 @@ describe('DecisionLog', () => {
       expect(screen.getByText(reasoning)).toBeInTheDocument()
     })
 
+    it('displays llm_model when present', () => {
+      render(<DecisionLog decisions={[createDecision({ llm_model: 'claude-sonnet-4-5' })]} />)
+      expect(screen.getByText('claude-sonnet-4-5')).toBeInTheDocument()
+    })
+
+    it('does not display llm_model badge when null', () => {
+      render(<DecisionLog decisions={[createDecision({ llm_model: null })]} />)
+      // Decision should still render
+      expect(screen.getByText('BTC')).toBeInTheDocument()
+      // But without the model badge
+      expect(screen.queryByText('claude-sonnet-4-5')).not.toBeInTheDocument()
+    })
+
     it('displays rejection reason when rejected', () => {
       render(
         <DecisionLog

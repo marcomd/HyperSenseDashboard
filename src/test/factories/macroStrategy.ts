@@ -8,6 +8,7 @@ interface MacroStrategyOverrides {
   risk_tolerance?: number
   market_narrative?: string
   key_levels?: Record<string, { support: number[]; resistance: number[] }>
+  llm_model?: string | null
   valid_until?: string
   created_at?: string
   stale?: boolean
@@ -35,6 +36,7 @@ export function createMacroStrategy(
         resistance: [3600, 3800, 4000],
       },
     },
+    llm_model: overrides.llm_model ?? 'claude-sonnet-4-5',
     valid_until:
       overrides.valid_until ??
       new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),

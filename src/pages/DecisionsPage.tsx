@@ -120,6 +120,15 @@ export function DecisionsPage() {
       ),
     },
     {
+      key: 'llm_model',
+      header: 'Model',
+      render: (decision: TradingDecision) => (
+        <span className="text-slate-400 text-sm">
+          {decision.llm_model || '-'}
+        </span>
+      ),
+    },
+    {
       key: 'created_at',
       header: 'Created',
       render: (decision: TradingDecision) => (

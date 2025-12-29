@@ -44,6 +44,7 @@ export interface TradingDecision {
   stop_loss: number | null;
   take_profit: number | null;
   reasoning: string | null;
+  llm_model: string | null;
   created_at: string;
 }
 
@@ -54,6 +55,7 @@ export interface MacroStrategy {
   risk_tolerance: number;
   market_narrative: string;
   key_levels?: Record<string, { support: number[]; resistance: number[] }>;
+  llm_model: string | null;
   valid_until: string;
   created_at: string;
   stale: boolean;

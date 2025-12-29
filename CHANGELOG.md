@@ -5,6 +5,21 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025-12-29
+
+### Added
+- **LLM Model Display** - Show which LLM model made each trading decision
+  - `DecisionLog` component now displays `llm_model` badge next to confidence
+  - `DecisionsPage` table now includes "Model" column
+  - `TradingDecision` TypeScript interface updated with `llm_model` field
+  - `MacroStrategy` TypeScript interface updated with `llm_model` field
+
+### Technical Details
+- 2 new test examples for llm_model display
+- All 294 tests passing
+
+### Support Backend (0.16.0)
+
 ## [0.4.0] - 2025-12-29
 
 ### Added

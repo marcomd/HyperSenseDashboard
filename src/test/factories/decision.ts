@@ -20,6 +20,7 @@ interface DecisionOverrides {
   stop_loss?: number | null
   take_profit?: number | null
   reasoning?: string | null
+  llm_model?: string | null
   created_at?: string
 }
 
@@ -43,6 +44,7 @@ export function createDecision(overrides: DecisionOverrides = {}): TradingDecisi
     reasoning:
       overrides.reasoning ??
       'Strong bullish momentum with RSI breakout above 50 level.',
+    llm_model: overrides.llm_model === undefined ? 'claude-sonnet-4-5' : overrides.llm_model,
     created_at: overrides.created_at ?? new Date().toISOString(),
   }
 }

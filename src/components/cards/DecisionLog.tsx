@@ -107,6 +107,11 @@ function DecisionItem({ decision }: { decision: TradingDecision }) {
                 {(decision.confidence * 100).toFixed(0)}% conf
               </span>
             )}
+            {decision.llm_model && (
+              <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
+                {decision.llm_model}
+              </span>
+            )}
           </div>
 
           {/* Reasoning */}

@@ -170,6 +170,52 @@ describe('DecisionsPage', () => {
       expect(screen.getByText('close')).toBeInTheDocument()
     })
 
+    it('displays llm_model column', async () => {
+      server.use(
+        http.get('/api/v1/decisions', () => {
+          return HttpResponse.json({
+            decisions: [
+              createDecision({ id: 1, symbol: 'BTC', llm_model: 'claude-sonnet-4-5' }),
+            ],
+            meta: { page: 1, per_page: 25, total: 1, total_pages: 1 },
+          })
+        })
+      )
+
+      render(<DecisionsPage />, { initialEntries: ['/decisions'] })
+
+      await waitFor(() => {
+        expect(screen.getByText('BTC')).toBeInTheDocument()
+      })
+
+      // Check the Model column header exists
+      expect(screen.getByText('Model')).toBeInTheDocument()
+      // Check the model value is displayed
+      expect(screen.getByText('claude-sonnet-4-5')).toBeInTheDocument()
+    })
+
+    it('displays dash for null llm_model', async () => {
+      server.use(
+        http.get('/api/v1/decisions', () => {
+          return HttpResponse.json({
+            decisions: [
+              createDecision({ id: 1, symbol: 'BTC', llm_model: null }),
+            ],
+            meta: { page: 1, per_page: 25, total: 1, total_pages: 1 },
+          })
+        })
+      )
+
+      render(<DecisionsPage />, { initialEntries: ['/decisions'] })
+
+      await waitFor(() => {
+        expect(screen.getByText('BTC')).toBeInTheDocument()
+      })
+
+      // Check for dash placeholder when llm_model is null
+      expect(screen.getByText('-')).toBeInTheDocument()
+    })
+
     it('displays empty state when no decisions', async () => {
       server.use(
         http.get('/api/v1/decisions', () => {
