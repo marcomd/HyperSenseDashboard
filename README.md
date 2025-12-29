@@ -84,6 +84,7 @@ src/
 │   ├── MacroStrategiesPage.tsx   # Macro strategies history
 │   ├── ForecastsPage.tsx         # Price forecasts history
 │   ├── MarketSnapshotsPage.tsx   # Market snapshots history
+│   ├── ExecutionLogsPage.tsx     # Execution logs history
 │   └── NotFoundPage.tsx          # 404 page
 ├── types/
 │   └── index.ts                  # TypeScript type definitions
@@ -197,6 +198,7 @@ The application uses React Router for client-side navigation:
 | `/macro-strategies` | MacroStrategiesPage | Macro strategies history with filters  |
 | `/forecasts`        | ForecastsPage       | Price forecasts history with filters   |
 | `/market-snapshots` | MarketSnapshotsPage | Market snapshots history with filters  |
+| `/execution-logs`   | ExecutionLogsPage   | Execution logs with status/action filters |
 
 ### Detail Pages Features
 
