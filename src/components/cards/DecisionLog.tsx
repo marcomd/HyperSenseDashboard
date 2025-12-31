@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   ArrowUp,
   ArrowDown,
@@ -14,7 +15,30 @@ interface DecisionLogProps {
   title?: string;
 }
 
+/**
+ * Displays a list of recent trading decisions with expandable reasoning text.
+ * Each decision item shows operation, symbol, confidence, status, and time.
+ * Truncated reasoning can be expanded by clicking "show more".
+ */
 export function DecisionLog({ decisions, title = 'Recent Decisions' }: DecisionLogProps) {
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+
+  /**
+   * Toggles the expanded state of a decision's reasoning text.
+   * @param id - The decision ID to toggle
+   */
+  const toggleExpanded = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   if (decisions.length === 0) {
     return (
       <div className="card">
@@ -37,14 +61,29 @@ export function DecisionLog({ decisions, title = 'Recent Decisions' }: DecisionL
       </div>
       <div className="card-body space-y-3">
         {decisions.map((decision) => (
-          <DecisionItem key={decision.id} decision={decision} />
+          <DecisionItem
+            key={decision.id}
+            decision={decision}
+            isExpanded={expandedIds.has(decision.id)}
+            onToggleExpand={() => toggleExpanded(decision.id)}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function DecisionItem({ decision }: { decision: TradingDecision }) {
+interface DecisionItemProps {
+  decision: TradingDecision;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+}
+
+/**
+ * Renders a single decision item with expandable reasoning text.
+ * Shows operation icon, symbol, confidence, status, time, and reasoning.
+ */
+function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProps) {
   const OperationIcon = {
     open: decision.direction === 'long' ? ArrowUp : ArrowDown,
     close: decision.direction === 'long' ? ArrowDown : ArrowUp,
@@ -83,7 +122,7 @@ function DecisionItem({ decision }: { decision: TradingDecision }) {
         {/* Operation Icon */}
         <div
           className={clsx(
-            'p-2 rounded-lg',
+            'p-2 rounded-lg flex-shrink-0',
             decision.operation === 'hold'
               ? 'bg-slate-500/20'
               : decision.direction === 'long'
@@ -96,7 +135,7 @@ function DecisionItem({ decision }: { decision: TradingDecision }) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-white">{decision.symbol}</span>
             <span className={clsx('text-sm capitalize', operationColor)}>
               {decision.operation}
@@ -114,11 +153,13 @@ function DecisionItem({ decision }: { decision: TradingDecision }) {
             )}
           </div>
 
-          {/* Reasoning */}
+          {/* Reasoning with expand/collapse */}
           {decision.reasoning && (
-            <p className="text-sm text-slate-400 mt-1 line-clamp-2">
-              {decision.reasoning}
-            </p>
+            <ExpandableText
+              text={decision.reasoning}
+              isExpanded={isExpanded}
+              onToggle={onToggleExpand}
+            />
           )}
 
           {/* Rejection reason */}
@@ -130,7 +171,7 @@ function DecisionItem({ decision }: { decision: TradingDecision }) {
         </div>
 
         {/* Status and Time */}
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-end gap-1 flex-shrink-0">
           <div className={clsx('flex items-center gap-1 text-xs', statusColor)}>
             <StatusIcon className="w-3 h-3" />
             <span className="capitalize">{decision.status}</span>
@@ -149,4 +190,38 @@ function getTimeAgo(date: Date): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+/** Threshold in characters before text is truncated. */
+const TRUNCATE_LENGTH = 180;
+
+interface ExpandableTextProps {
+  text: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+/**
+ * Displays text that can be expanded/collapsed if it exceeds the truncation threshold.
+ * Shows a "show more" / "show less" button when text is truncatable.
+ */
+function ExpandableText({ text, isExpanded, onToggle }: ExpandableTextProps) {
+  const isTruncatable = text.length > TRUNCATE_LENGTH;
+  const displayText = isExpanded || !isTruncatable
+    ? text
+    : text.slice(0, TRUNCATE_LENGTH);
+
+  return (
+    <p className="text-sm text-slate-400 mt-1">
+      {displayText}
+      {isTruncatable && (
+        <button
+          onClick={onToggle}
+          className="ml-1 text-accent hover:text-accent-hover transition-colors"
+        >
+          {isExpanded ? 'show less' : '...show more'}
+        </button>
+      )}
+    </p>
+  );
 }

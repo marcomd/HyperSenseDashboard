@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.6.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.7.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 
@@ -54,10 +54,11 @@ src/
 ├── components/
 │   ├── cards/
 │   │   ├── AccountSummary.tsx    # Account stats (positions, PnL, margin)
+│   │   ├── CostSummaryCard.tsx   # Cost breakdown and net P&L
 │   │   ├── DecisionLog.tsx       # Recent trading decisions
 │   │   ├── MacroStrategyCard.tsx # Market bias and narrative
 │   │   ├── MarketOverview.tsx    # Asset prices and indicators
-│   │   ├── PositionsTable.tsx    # Open positions table
+│   │   ├── PositionsTable.tsx    # Open positions with gross/net P&L
 │   │   └── SystemStatus.tsx      # Health status indicators
 │   ├── charts/
 │   │   └── EquityCurve.tsx       # Performance chart (Recharts)
@@ -100,8 +101,9 @@ src/
 | Component           | Description                                                  |
 | ------------------- | ------------------------------------------------------------ |
 | `AccountSummary`    | Open positions count, unrealized PnL, margin used, daily P&L |
+| `CostSummaryCard`   | Net P&L, trading fees, LLM costs, server costs breakdown     |
 | `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts            |
-| `PositionsTable`    | Open positions with entry, current price, PnL%, SL/TP        |
+| `PositionsTable`    | Open positions with entry, current price, gross/net PnL, SL/TP |
 | `EquityCurve`       | Cumulative PnL chart with win rate statistics                |
 | `MacroStrategyCard` | Market bias (bullish/bearish/neutral), narrative, key levels |
 | `DecisionLog`       | Recent trading decisions with status and reasoning           |
@@ -231,6 +233,11 @@ const market = await api.marketData.getCurrent();
 
 // Macro strategy
 const strategy = await api.macroStrategies.getCurrent();
+
+// Costs
+const costSummary = await api.costs.getSummary('today');
+const llmCosts = await api.costs.getLLM();
+const tradingFees = await api.costs.getTrading();
 ```
 
 ## Real-time Updates

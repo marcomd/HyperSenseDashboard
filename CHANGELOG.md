@@ -5,6 +5,21 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-12-31
+
+### Changed
+- **Dashboard Layout** - Improved layout for better horizontal space utilization
+  - Moved "Cost Summary" card next to "Account Summary" in the top row
+  - Moved "Recent Decisions" below "Performance" graph for more display space
+  - Right column now contains only "Macro Strategy" and "System Status"
+- **Expandable Decision Reasoning** - Decision descriptions can now be expanded
+  - Truncated text (over 150 chars) shows "...show more" button
+  - Click to expand/collapse full reasoning text
+  - Improved readability with more horizontal space
+
+### Technical Details
+- All 303 tests passing
+
 ## [0.6.0] - 2025-12-31
 
 ### Added

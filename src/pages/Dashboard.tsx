@@ -82,25 +82,23 @@ export function Dashboard() {
 
       <main className="flex-1 p-6">
         <div className="max-w-7xl mx-auto space-y-6">
-          {/* Top Row: Account Summary */}
-          <AccountSummary account={account} />
-
-          {/* Market Overview */}
+          {/* Market Overview - Top of dashboard */}
           <MarketOverview market={market} />
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Positions & Performance */}
+            {/* Left Column: Account, Positions, Performance & Recent Decisions */}
             <div className="lg:col-span-2 space-y-6">
+              <AccountSummary account={account} />
               <PositionsTable positions={positions} />
               <EquityCurve data={performanceData} isLoading={perfLoading} />
+              <DecisionLog decisions={recent_decisions} />
             </div>
 
-            {/* Right Column: Costs, Strategy, Decisions, Status */}
+            {/* Right Column: Costs, Strategy & Status */}
             <div className="space-y-6">
               <CostSummaryCard costs={cost_summary} />
               <MacroStrategyCard strategy={macro_strategy} />
-              <DecisionLog decisions={recent_decisions} />
               <SystemStatus status={system_status} />
             </div>
           </div>
