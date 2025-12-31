@@ -9,6 +9,7 @@ import {
   MarketOverview,
   SystemStatus,
   EquityCurve,
+  CostSummaryCard,
 } from '@/components';
 import { useDashboard, usePerformance, useHealth } from '@/hooks/useApi';
 
@@ -61,8 +62,15 @@ export function Dashboard() {
     );
   }
 
-  const { account, positions, market, macro_strategy, recent_decisions, system_status } =
-    dashboardData;
+  const {
+    account,
+    positions,
+    market,
+    macro_strategy,
+    recent_decisions,
+    system_status,
+    cost_summary,
+  } = dashboardData;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -88,8 +96,9 @@ export function Dashboard() {
               <EquityCurve data={performanceData} isLoading={perfLoading} />
             </div>
 
-            {/* Right Column: Strategy, Decisions, Status */}
+            {/* Right Column: Costs, Strategy, Decisions, Status */}
             <div className="space-y-6">
+              <CostSummaryCard costs={cost_summary} />
               <MacroStrategyCard strategy={macro_strategy} />
               <DecisionLog decisions={recent_decisions} />
               <SystemStatus status={system_status} />

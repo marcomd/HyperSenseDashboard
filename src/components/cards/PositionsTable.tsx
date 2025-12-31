@@ -100,6 +100,11 @@ function PositionRow({ position }: { position: Position }) {
             {isProfitable ? '+' : ''}
             ${(position.unrealized_pnl ?? 0).toFixed(2)}
           </span>
+          {position.fees && (
+            <span className="text-xs text-slate-500">
+              Net: ${position.fees.net_pnl.toFixed(2)}
+            </span>
+          )}
           <span
             className={clsx(
               'text-xs',

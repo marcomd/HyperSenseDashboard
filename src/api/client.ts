@@ -12,6 +12,9 @@ import type {
   ForecastListItem,
   ExecutionLog,
   ExecutionLogsStats,
+  CostsSummaryResponse,
+  CostsLLMResponse,
+  CostsTradingResponse,
 } from '@/types';
 
 const API_BASE = '/api/v1';
@@ -78,7 +81,14 @@ export const positionsApi = {
   getOpen: () =>
     fetchApi<{
       positions: Position[];
-      summary: { count: number; total_pnl: number; total_margin: number };
+      summary: {
+        count: number;
+        total_pnl: number;
+        gross_pnl: number;
+        total_fees: number;
+        net_pnl: number;
+        total_margin: number;
+      };
     }>('/positions/open'),
 
   getById: (id: number) =>
@@ -258,6 +268,16 @@ export const executionLogsApi = {
     ),
 };
 
+// Costs API
+export const costsApi = {
+  getSummary: (period: 'today' | 'week' | 'month' | 'all' = 'today') =>
+    fetchApi<CostsSummaryResponse>(`/costs/summary?period=${period}`),
+
+  getLLM: () => fetchApi<CostsLLMResponse>('/costs/llm'),
+
+  getTrading: () => fetchApi<CostsTradingResponse>('/costs/trading'),
+};
+
 // Export all APIs
 export const api = {
   health: healthApi,
@@ -269,6 +289,7 @@ export const api = {
   marketSnapshots: marketSnapshotsApi,
   forecasts: forecastsApi,
   executionLogs: executionLogsApi,
+  costs: costsApi,
 };
 
 export default api;

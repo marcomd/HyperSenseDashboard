@@ -5,6 +5,37 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-12-31
+
+### Added
+- **Cost Summary Card** - New dashboard component showing cost breakdown and net P&L
+  - `CostSummaryCard` - Displays trading fees, LLM costs, server costs, and net realized P&L
+  - Net P&L highlighted with color coding (green for profit, red for loss)
+  - Shows LLM provider and model information
+  - Shows gross vs net P&L breakdown
+- **Position Fees Display** - Positions now show fee information
+  - `PositionsTable` displays net P&L under gross P&L for each position
+  - All position responses include `fees` object with entry/exit/total fees
+- **Costs API Client** - New API methods for detailed cost queries
+  - `costsApi.getSummary(period)` - Get detailed cost breakdown for a period
+  - `costsApi.getLLM()` - Get LLM cost details
+  - `costsApi.getTrading()` - Get trading fee details
+- **Cost Types** - New TypeScript interfaces for cost data
+  - `CostSummary`, `PositionFees`, `DetailedCosts`, `NetPnL`
+  - `TradingFeesBreakdown`, `LLMCostsBreakdown`, `ServerCostBreakdown`
+
+### Changed
+- `DashboardData` interface now includes `cost_summary` field
+- `Position` interface now includes optional `fees` field
+- `EquityPoint` interface now includes fee-related fields
+- `PerformanceStats` interface now includes `total_fees` and `net_pnl`
+
+### Technical Details
+- 9 new tests for CostSummaryCard component
+- All 303 tests passing
+
+### Supports Backend (0.21.0)
+
 ## [0.5.0] - 2025-12-29
 
 ### Added

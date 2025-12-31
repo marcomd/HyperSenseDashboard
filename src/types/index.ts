@@ -8,6 +8,14 @@ export type Operation = 'open' | 'close' | 'hold';
 export type RsiSignal = 'oversold' | 'overbought' | 'neutral';
 export type MacdSignal = 'bullish' | 'bearish';
 
+// Position Fees
+export interface PositionFees {
+  entry_fee: number;
+  exit_fee: number;
+  total_fees: number;
+  net_pnl: number;
+}
+
 // Position
 export interface Position {
   id: number;
@@ -28,6 +36,7 @@ export interface Position {
   closed_at: string | null;
   close_reason: string | null;
   realized_pnl: number | null;
+  fees?: PositionFees;
 }
 
 // Trading Decision
@@ -86,6 +95,19 @@ export interface Forecast {
   created_at: string;
 }
 
+// Cost Summary for dashboard
+export interface CostSummary {
+  period: string;
+  trading_fees: number;
+  llm_costs: number;
+  server_cost_daily: number;
+  total_costs: number;
+  gross_realized_pnl: number;
+  net_realized_pnl: number;
+  llm_provider: string;
+  llm_model: string;
+}
+
 // Dashboard Response
 export interface DashboardData {
   account: AccountSummary;
@@ -94,6 +116,7 @@ export interface DashboardData {
   macro_strategy: MacroStrategy | null;
   recent_decisions: TradingDecision[];
   system_status: SystemStatus;
+  cost_summary: CostSummary;
 }
 
 export interface AccountSummary {
@@ -132,7 +155,10 @@ export interface SystemStatus {
 export interface EquityPoint {
   date: string;
   daily_pnl: number;
+  daily_fees?: number;
   cumulative_pnl: number;
+  cumulative_fees?: number;
+  cumulative_net_pnl?: number;
 }
 
 export interface PerformanceStats {
@@ -141,6 +167,8 @@ export interface PerformanceStats {
   losses: number;
   win_rate: number;
   total_pnl: number;
+  total_fees?: number;
+  net_pnl?: number;
   avg_win: number;
   avg_loss: number;
 }
@@ -287,4 +315,92 @@ export interface ExecutionLogsStats {
   by_status: Record<string, number>;
   by_action: Record<string, number>;
   success_rate: number;
+}
+
+// Detailed Cost Types (for /api/v1/costs endpoints)
+
+export interface TradingFeesBreakdown {
+  entry_fees: number;
+  exit_fees: number;
+  open_position_entry_fees: number;
+  total: number;
+  fee_rate: number;
+  positions_counted: number;
+}
+
+export interface LLMPricing {
+  input_per_million: number;
+  output_per_million: number;
+}
+
+export interface LLMCostsBreakdown {
+  provider: string;
+  model: string;
+  pricing: LLMPricing;
+  macro_strategy: {
+    calls: number;
+    estimated_input_tokens: number;
+    estimated_output_tokens: number;
+    cost: number;
+  };
+  trading_decisions: {
+    calls: number;
+    estimated_input_tokens: number;
+    estimated_output_tokens: number;
+    cost: number;
+  };
+  total_calls: number;
+  total: number;
+}
+
+export interface ServerCostBreakdown {
+  monthly_rate: number;
+  daily_rate: number;
+  days: number;
+  prorated: number;
+}
+
+export interface DetailedCosts {
+  period: string;
+  period_start: string | null;
+  trading_fees: TradingFeesBreakdown;
+  llm_costs: LLMCostsBreakdown;
+  server_cost: ServerCostBreakdown;
+  total_costs: number;
+}
+
+export interface NetPnL {
+  gross_realized_pnl: number;
+  gross_unrealized_pnl: number;
+  trading_fees: number;
+  net_realized_pnl: number;
+  net_unrealized_pnl: number;
+  net_total_pnl: number;
+}
+
+export interface CostsSummaryResponse {
+  costs: DetailedCosts;
+  pnl: NetPnL;
+}
+
+export interface CostsLLMResponse {
+  today: LLMCostsBreakdown;
+  week: LLMCostsBreakdown;
+  month: LLMCostsBreakdown;
+  pricing: {
+    provider: string;
+    model: string;
+    pricing: LLMPricing;
+  };
+}
+
+export interface CostsTradingResponse {
+  today: TradingFeesBreakdown;
+  week: TradingFeesBreakdown;
+  month: TradingFeesBreakdown;
+  fee_rates: {
+    taker: number;
+    maker: number;
+    current: string;
+  };
 }
