@@ -1,5 +1,7 @@
 // Layout
 export { Header } from './layout/Header';
+export { Footer } from './layout/Footer';
+export { AppLayout } from './layout/AppLayout';
 
 // Cards
 export { AccountSummary } from './cards/AccountSummary';

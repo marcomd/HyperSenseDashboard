@@ -144,7 +144,7 @@ export interface AccountSummary {
   realized_pnl_today: number;
   paper_trading: boolean;
   circuit_breaker: {
-    trading_allowed: boolean;
+    // Note: trading_allowed comes from TradingStatusContext (via /health endpoint)
     daily_loss: number | null;
     consecutive_losses: number | null;
   };

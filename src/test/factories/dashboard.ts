@@ -19,7 +19,6 @@ interface AccountSummaryOverrides {
   realized_pnl_today?: number
   paper_trading?: boolean
   circuit_breaker?: {
-    trading_allowed: boolean
     daily_loss: number | null
     consecutive_losses: number | null
   }
@@ -36,7 +35,6 @@ export function createAccountSummary(
     realized_pnl_today: overrides.realized_pnl_today ?? 75.5,
     paper_trading: overrides.paper_trading ?? true,
     circuit_breaker: overrides.circuit_breaker ?? {
-      trading_allowed: true,
       daily_loss: -50,
       consecutive_losses: 0,
     },

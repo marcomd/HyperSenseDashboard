@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, act } from '@/test/test-utils'
 import { AccountSummary } from './AccountSummary'
 import { createAccountSummary } from '@/test/factories'
+import * as TradingStatusContext from '@/contexts/TradingStatusContext'
 
 describe('AccountSummary', () => {
   it('renders the Account Summary title', () => {
@@ -62,11 +63,20 @@ describe('AccountSummary', () => {
 
   describe('Circuit Breaker', () => {
     it('shows Circuit Breaker Active badge when trading not allowed', () => {
+      // Mock context to return tradingAllowed: false
+      vi.spyOn(TradingStatusContext, 'useTradingStatus').mockReturnValue({
+        tradingAllowed: false,
+        paperTrading: false,
+        backendVersion: '0.27.0',
+        frontendVersion: '0.10.0',
+        environment: 'test',
+        isLoading: false,
+      })
+
       render(
         <AccountSummary
           account={createAccountSummary({
             circuit_breaker: {
-              trading_allowed: false,
               daily_loss: -500,
               consecutive_losses: 3,
             },
@@ -74,6 +84,8 @@ describe('AccountSummary', () => {
         />
       )
       expect(screen.getByText('Circuit Breaker Active')).toBeInTheDocument()
+
+      vi.restoreAllMocks()
     })
 
     it('hides Circuit Breaker badge when trading is allowed', () => {
@@ -81,7 +93,6 @@ describe('AccountSummary', () => {
         <AccountSummary
           account={createAccountSummary({
             circuit_breaker: {
-              trading_allowed: true,
               daily_loss: null,
               consecutive_losses: null,
             },
@@ -96,7 +107,6 @@ describe('AccountSummary', () => {
         <AccountSummary
           account={createAccountSummary({
             circuit_breaker: {
-              trading_allowed: true,
               daily_loss: -150.5,
               consecutive_losses: null,
             },
@@ -112,7 +122,6 @@ describe('AccountSummary', () => {
         <AccountSummary
           account={createAccountSummary({
             circuit_breaker: {
-              trading_allowed: true,
               daily_loss: null,
               consecutive_losses: 3,
             },

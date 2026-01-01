@@ -26,6 +26,8 @@ export interface HealthResponse {
   ruby_version: string;
   rails_version: string;
   environment: string;
+  paper_trading: boolean;
+  trading_allowed: boolean;
   timestamp: string;
 }
 

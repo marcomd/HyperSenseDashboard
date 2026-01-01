@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.9.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.10.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 
@@ -64,7 +64,7 @@ src/
 │   │   └── EquityCurve.tsx       # Performance chart (Recharts)
 │   ├── common/
 │   │   ├── DataTable.tsx         # Generic data table with expand
-│   │   └── PageLayout.tsx        # Page wrapper with back link
+│   │   └── PageLayout.tsx        # Subpage wrapper with back link
 │   ├── filters/
 │   │   ├── DateRangeFilter.tsx   # Date range picker with presets
 │   │   ├── SymbolFilter.tsx      # Cryptocurrency symbol selector
@@ -73,7 +73,11 @@ src/
 │   │   ├── Pagination.tsx        # Page navigation controls
 │   │   └── FilterBar.tsx         # Composite filter container
 │   └── layout/
-│       └── Header.tsx            # App header with navigation
+│       ├── Header.tsx            # App header with navigation
+│       ├── Footer.tsx            # App footer with versions and status
+│       └── AppLayout.tsx         # Unified layout shell (Header + Footer)
+├── contexts/
+│   └── TradingStatusContext.tsx  # Shared trading status (paper mode, circuit breaker)
 ├── hooks/
 │   ├── useApi.ts                 # React Query hooks for data fetching
 │   ├── useWebSocket.ts           # ActionCable WebSocket integration
@@ -111,9 +115,11 @@ src/
 
 ### Layout
 
-| Component | Description                                                                          |
-| --------- | ------------------------------------------------------------------------------------ |
-| `Header`  | App title, navigation menu, paper trading badge, trading status, WebSocket indicator |
+| Component   | Description                                                                          |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `AppLayout` | Unified layout shell wrapping all pages with Header and Footer                       |
+| `Header`    | App title, navigation menu, paper trading badge, trading status, WebSocket indicator |
+| `Footer`    | Version info (backend/frontend), environment badge, connection status, refresh button|
 
 ### Filter Components
 
@@ -169,15 +175,15 @@ The header displays three status indicators:
 
 | Indicator             | States                                                        | Description                                                            |
 | --------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Paper Trading**     | Yellow badge (shown/hidden)                                   | Indicates sandbox mode when environment is not production              |
+| **Paper Trading**     | Yellow badge (shown/hidden)                                   | Indicates sandbox mode based on `paper_trading` setting from backend   |
 | **Trading Status**    | Green "Trading Active" / Red "Trading Halted"                 | Reflects circuit breaker state - whether the system can execute trades |
-| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "No realtime" | WebSocket connection state                                             |
+| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "Polling"     | WebSocket connection state (Dashboard) or polling mode (detail pages)  |
 
 #### Connection Status Explained
 
 - **Connected** (green): WebSocket is active, receiving real-time updates (Dashboard only)
 - **Disconnected** (red): WebSocket connection failed or dropped (Dashboard only)
-- **No realtime** (orange): Page intentionally doesn't use WebSocket (Detail pages)
+- **Polling** (gray): Page uses REST API polling instead of WebSocket (detail pages)
 
 #### Trading Status Explained
 
@@ -219,6 +225,9 @@ The dashboard connects to the Rails backend API:
 
 ```typescript
 import { api } from '@/api/client';
+
+// Health check (paper_trading, trading_allowed, version)
+const health = await api.health.getHealth();
 
 // Dashboard data (aggregated)
 const data = await api.dashboard.getDashboard();

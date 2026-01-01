@@ -5,6 +5,37 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-01-01
+
+### Added
+- **Unified Layout Architecture** - Centralized layout system for consistent UI across all pages
+  - `AppLayout` - New layout shell component wrapping Header and Footer
+  - `Footer` - New component displaying version info, environment, and connection status
+  - `TradingStatusContext` - React context for shared trading status across all pages
+- **Footer on All Pages** - All pages now display footer with backend/frontend versions and status
+
+### Changed
+- **Dashboard** - Now uses `AppLayout` instead of custom Header/Footer implementation
+- **PageLayout** - Simplified to use `AppLayout` internally, removing duplicate Header logic
+- **Paper Trading Badge** - Now reads actual `paper_trading` setting from backend health endpoint
+  - Previously used incorrect logic based on environment name
+- **Trading Status** - Circuit breaker status now shown correctly on all pages (was hardcoded on detail pages)
+- **Connection Status** - Changed "No realtime" label to "Polling" for clarity on detail pages
+
+### Fixed
+- **Paper Trading Display Bug** - Fixed issue where Paper Trading badge showed incorrectly on non-dashboard pages
+  - Root cause: PageLayout used `environment !== 'production'` instead of actual setting
+  - Now all pages use `TradingStatusContext` which fetches from `/health` endpoint
+
+### Technical Details
+- New `TradingStatusProvider` wraps all routes in `App.tsx`
+- `useTradingStatus` hook provides `paperTrading`, `tradingAllowed`, versions to any component
+- Backend `/health` endpoint is the single source of truth for `paper_trading` and `trading_allowed`
+- `TradingStatusContext` fetches only from `/health` (DRY principle - no duplicate dashboard fetch)
+- Test utilities updated to include `TradingStatusProvider` wrapper
+
+### Supports Backend (0.25.0)
+
 ## [0.9.0] - 2026-01-01
 
 ### Added

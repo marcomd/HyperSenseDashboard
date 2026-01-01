@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import type { AccountSummary as AccountSummaryType, VolatilityLevel } from '@/types';
 import { VolatilityBadge } from '@/components/common/VolatilityBadge';
 import { Tooltip } from '@/components/common/Tooltip';
+import { useTradingStatus } from '@/contexts/TradingStatusContext';
 
 interface AccountSummaryProps {
   account: AccountSummaryType;
@@ -20,6 +21,7 @@ const VOLATILITY_LABELS: Record<VolatilityLevel, string> = {
 const VOLATILITY_ORDER: VolatilityLevel[] = ['very_high', 'high', 'medium', 'low'];
 
 export function AccountSummary({ account }: AccountSummaryProps) {
+  const { tradingAllowed } = useTradingStatus();
   const isProfitable = account.total_unrealized_pnl >= 0;
   const todayProfitable = account.realized_pnl_today >= 0;
 
@@ -27,7 +29,7 @@ export function AccountSummary({ account }: AccountSummaryProps) {
     <div className="card">
       <div className="card-header flex items-center justify-between">
         <h2 className="text-lg font-semibold text-white">Account Summary</h2>
-        {!account.circuit_breaker.trading_allowed && (
+        {!tradingAllowed && (
           <div className="badge bg-red-500/20 text-red-400">
             <AlertCircle className="w-3 h-3 mr-1" />
             Circuit Breaker Active

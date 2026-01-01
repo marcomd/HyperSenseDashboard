@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { TradingStatusProvider } from '@/contexts/TradingStatusContext';
 import { Dashboard } from '@/pages/Dashboard';
 import { ForecastsPage } from '@/pages/ForecastsPage';
 import { MarketSnapshotsPage } from '@/pages/MarketSnapshotsPage';
@@ -36,7 +37,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppRoutes />
+        <TradingStatusProvider>
+          <AppRoutes />
+        </TradingStatusProvider>
       </BrowserRouter>
     </QueryClientProvider>
   );
