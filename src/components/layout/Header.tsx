@@ -1,6 +1,7 @@
-import { Activity, Wifi, WifiOff, AlertTriangle } from 'lucide-react';
+import { Activity, Wifi, WifiOff, AlertTriangle, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
+import { Tooltip } from '@/components/common/Tooltip';
 
 type WsStatus = 'connected' | 'disconnected' | 'not-needed';
 
@@ -47,19 +48,49 @@ export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: 
           )}
 
           {/* Trading Status */}
-          <div
-            className={clsx(
-              'badge',
-              tradingAllowed ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-            )}
-          >
-            <span
+          <div className="flex items-center gap-1">
+            <div
               className={clsx(
-                'status-dot mr-2',
-                tradingAllowed ? 'status-dot-success' : 'status-dot-error'
+                'badge',
+                tradingAllowed ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
               )}
-            />
-            {tradingAllowed ? 'Trading Active' : 'Trading Halted'}
+            >
+              <span
+                className={clsx(
+                  'status-dot mr-2',
+                  tradingAllowed ? 'status-dot-success' : 'status-dot-error'
+                )}
+              />
+              {tradingAllowed ? 'Trading Active' : 'Trading Halted'}
+            </div>
+            <Tooltip
+              content={
+                <div className="space-y-2">
+                  <p className="font-medium">Trading Status</p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-green-400 font-medium">Active:</span> The agent is monitoring
+                    markets and can execute trades normally.
+                  </p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-red-400 font-medium">Halted:</span> Circuit breaker triggered
+                    due to risk thresholds being exceeded.
+                  </p>
+                  <div className="border-t border-slate-600 pt-2 mt-2">
+                    <p className="text-slate-400 text-xs font-medium mb-1">Circuit breaker triggers:</p>
+                    <ul className="text-xs text-slate-300 space-y-0.5">
+                      <li>• Daily loss exceeds 5% of account</li>
+                      <li>• 3 consecutive losing trades</li>
+                    </ul>
+                  </div>
+                  <p className="text-slate-400 text-xs italic">
+                    Trading resumes after 24h cooldown.
+                  </p>
+                </div>
+              }
+              position="bottom"
+            >
+              <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help" />
+            </Tooltip>
           </div>
 
           {/* WebSocket Status */}

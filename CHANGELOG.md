@@ -5,6 +5,25 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-01-01
+
+### Added
+- **Trading Status Tooltip** - Info icon next to "Trading Active/Halted" badge in Header
+  - Explains what Active vs Halted means
+  - Shows circuit breaker trigger conditions (5% daily loss, 3 consecutive losses)
+  - Mentions 24h cooldown before auto-resume
+
+### Changed
+- **Wider Tooltips** - Increased tooltip width from `max-w-xs` (320px) to `max-w-md` (448px)
+  - Added `min-w-64` (256px) minimum width for better readability
+  - Fixes narrow text wrapping in volatility and trading status tooltips
+
+### Technical Details
+- `Tooltip` component updated with `min-w-64 max-w-md` classes
+- `Header` component imports `Tooltip` and `Info` icon
+
+### Supports Backend (0.25.0)
+
 ## [0.10.0] - 2026-01-01
 
 ### Added

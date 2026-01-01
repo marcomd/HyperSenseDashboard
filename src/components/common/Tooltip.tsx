@@ -95,7 +95,7 @@ export function Tooltip({
           className={clsx(
             'absolute z-50 px-3 py-2 text-sm rounded-lg shadow-lg',
             'bg-slate-700 text-slate-100 border border-slate-600',
-            'whitespace-normal max-w-xs',
+            'whitespace-normal min-w-64 max-w-md',
             'animate-in fade-in-0 zoom-in-95 duration-150',
             positionClasses[position],
             className
