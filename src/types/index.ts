@@ -7,6 +7,20 @@ export type DecisionStatus = 'pending' | 'approved' | 'rejected' | 'executed' | 
 export type Operation = 'open' | 'close' | 'hold';
 export type RsiSignal = 'oversold' | 'overbought' | 'neutral';
 export type MacdSignal = 'bullish' | 'bearish';
+export type VolatilityLevel = 'very_high' | 'high' | 'medium' | 'low';
+
+// Volatility intervals configuration (minutes per level)
+export type VolatilityIntervals = Record<VolatilityLevel, number>;
+
+// Volatility Info from latest trading decision
+export interface VolatilityInfo {
+  volatility_level: VolatilityLevel | null;
+  atr_value: number | null;
+  next_cycle_interval: number | null;
+  next_cycle_at: string | null;
+  last_decision_at: string | null;
+  intervals?: VolatilityIntervals;
+}
 
 // Position Fees
 export interface PositionFees {
@@ -53,7 +67,11 @@ export interface TradingDecision {
   stop_loss: number | null;
   take_profit: number | null;
   reasoning: string | null;
-  llm_model: string | null;
+  volatility_level: VolatilityLevel | null;
+  atr_value: number | null;
+  next_cycle_interval: number | null;
+  // llm_model is only in detailed view (expand to see)
+  llm_model?: string | null;
   created_at: string;
 }
 
@@ -130,6 +148,7 @@ export interface AccountSummary {
     daily_loss: number | null;
     consecutive_losses: number | null;
   };
+  volatility_info: VolatilityInfo | null;
 }
 
 export interface MarketOverview {
@@ -149,6 +168,11 @@ export interface SystemStatus {
   macro_strategy: { healthy: boolean; last_update: string | null; stale: boolean | null };
   paper_trading: boolean;
   assets_tracked: string[];
+}
+
+// Extended SystemStatus with volatility info for next cycle timing display
+export interface SystemStatusWithVolatility extends SystemStatus {
+  volatility_info: VolatilityInfo | null;
 }
 
 // Performance/Equity Curve
@@ -223,6 +247,7 @@ export interface ListFilterParams {
   symbol?: string;
   status?: string;
   operation?: string;
+  volatility_level?: string;
   search?: string;
   page?: number;
   per_page?: number;
@@ -267,6 +292,8 @@ export interface ForecastListItem {
 
 // Extended Trading Decision with full context
 export interface TradingDecisionDetail extends TradingDecision {
+  // llm_model is always present in detailed view
+  llm_model: string | null;
   target_position?: number | null;
   context_sent?: Record<string, unknown>;
   llm_response?: Record<string, unknown>;

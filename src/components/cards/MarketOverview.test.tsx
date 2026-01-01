@@ -126,4 +126,50 @@ describe('MarketOverview', () => {
       expect(screen.getByText('SOL')).toBeInTheDocument()
     })
   })
+
+  describe('Volatility Badge', () => {
+    it('displays volatility row with label when recentDecisions provided', () => {
+      const market = { BTC: createMarketOverview() }
+      const recentDecisions = [
+        { id: 1, symbol: 'BTC', volatility_level: 'high' as const, operation: 'open' as const, direction: 'long' as const, confidence: 0.8, status: 'executed' as const, executed: true, rejection_reason: null, leverage: 5, stop_loss: 95000, take_profit: 105000, reasoning: 'Test', atr_value: 0.025, next_cycle_interval: 6, created_at: new Date().toISOString() },
+      ]
+      render(<MarketOverview market={market} recentDecisions={recentDecisions} />)
+      expect(screen.getByText('Volatility')).toBeInTheDocument()
+      expect(screen.getByText('High')).toBeInTheDocument()
+    })
+
+    it('displays correct volatility level for each symbol', () => {
+      const market = {
+        BTC: createMarketOverview(),
+        ETH: createMarketOverview({ price: 3500 }),
+      }
+      const recentDecisions = [
+        { id: 1, symbol: 'BTC', volatility_level: 'very_high' as const, operation: 'open' as const, direction: 'long' as const, confidence: 0.8, status: 'executed' as const, executed: true, rejection_reason: null, leverage: 5, stop_loss: 95000, take_profit: 105000, reasoning: 'Test', atr_value: 0.035, next_cycle_interval: 3, created_at: new Date().toISOString() },
+        { id: 2, symbol: 'ETH', volatility_level: 'low' as const, operation: 'open' as const, direction: 'long' as const, confidence: 0.7, status: 'executed' as const, executed: true, rejection_reason: null, leverage: 3, stop_loss: 3200, take_profit: 4000, reasoning: 'Test', atr_value: 0.008, next_cycle_interval: 25, created_at: new Date().toISOString() },
+      ]
+      render(<MarketOverview market={market} recentDecisions={recentDecisions} />)
+      expect(screen.getByText('Very High')).toBeInTheDocument()
+      expect(screen.getByText('Low')).toBeInTheDocument()
+    })
+
+    it('does not display volatility row when no matching decision', () => {
+      const market = { BTC: createMarketOverview() }
+      const recentDecisions = [
+        { id: 1, symbol: 'ETH', volatility_level: 'high' as const, operation: 'open' as const, direction: 'long' as const, confidence: 0.8, status: 'executed' as const, executed: true, rejection_reason: null, leverage: 5, stop_loss: 3200, take_profit: 4000, reasoning: 'Test', atr_value: 0.025, next_cycle_interval: 6, created_at: new Date().toISOString() },
+      ]
+      render(<MarketOverview market={market} recentDecisions={recentDecisions} />)
+      // BTC should render but without volatility row
+      expect(screen.getByText('BTC')).toBeInTheDocument()
+      expect(screen.queryByText('High')).not.toBeInTheDocument()
+    })
+
+    it('does not display volatility row without recentDecisions prop', () => {
+      const market = { BTC: createMarketOverview() }
+      render(<MarketOverview market={market} />)
+      expect(screen.getByText('BTC')).toBeInTheDocument()
+      // No volatility rows should be displayed
+      expect(screen.queryByText('High')).not.toBeInTheDocument()
+      expect(screen.queryByText('Low')).not.toBeInTheDocument()
+    })
+  })
 })

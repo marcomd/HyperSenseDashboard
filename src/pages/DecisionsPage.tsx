@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PageLayout, DataTable } from '@/components/common'
+import { PageLayout, DataTable, VolatilityBadge } from '@/components/common'
 import {
   DateRangeFilter,
   SymbolFilter,
@@ -24,12 +24,20 @@ const OPERATION_OPTIONS = [
   { value: 'hold', label: 'Hold' },
 ]
 
+const VOLATILITY_OPTIONS = [
+  { value: 'very_high', label: 'Very High' },
+  { value: 'high', label: 'High' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'low', label: 'Low' },
+]
+
 export function DecisionsPage() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [symbol, setSymbol] = useState('')
   const [status, setStatus] = useState('')
   const [operation, setOperation] = useState('')
+  const [volatilityLevel, setVolatilityLevel] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(25)
@@ -40,6 +48,7 @@ export function DecisionsPage() {
     symbol: symbol || undefined,
     status: status || undefined,
     operation: operation || undefined,
+    volatility_level: volatilityLevel || undefined,
     search: search || undefined,
     page,
     per_page: pageSize,
@@ -120,12 +129,10 @@ export function DecisionsPage() {
       ),
     },
     {
-      key: 'llm_model',
-      header: 'Model',
+      key: 'volatility_level',
+      header: 'Volatility',
       render: (decision: TradingDecision) => (
-        <span className="text-slate-400 text-sm">
-          {decision.llm_model || '-'}
-        </span>
+        <VolatilityBadge level={decision.volatility_level} />
       ),
     },
     {
@@ -143,16 +150,22 @@ export function DecisionsPage() {
         <h4 className="text-sm font-medium text-slate-400 mb-1">Reasoning</h4>
         <p className="text-sm text-slate-300">{decision.reasoning}</p>
       </div>
+      {decision.llm_model && (
+        <div>
+          <h4 className="text-sm font-medium text-slate-400 mb-1">Model</h4>
+          <p className="text-sm text-slate-300">{decision.llm_model}</p>
+        </div>
+      )}
+      {decision.atr_value != null && (
+        <div>
+          <h4 className="text-sm font-medium text-slate-400 mb-1">ATR Value</h4>
+          <p className="text-sm text-slate-300">{(decision.atr_value * 100).toFixed(2)}%</p>
+        </div>
+      )}
       {decision.rejection_reason && (
         <div>
           <h4 className="text-sm font-medium text-red-400 mb-1">Rejection Reason</h4>
           <p className="text-sm text-slate-300">{decision.rejection_reason}</p>
-        </div>
-      )}
-      {decision.position_id && (
-        <div>
-          <h4 className="text-sm font-medium text-slate-400 mb-1">Position ID</h4>
-          <p className="text-sm text-slate-300">#{decision.position_id}</p>
         </div>
       )}
     </div>
@@ -188,6 +201,12 @@ export function DecisionsPage() {
             options={OPERATION_OPTIONS}
             value={operation}
             onChange={setOperation}
+          />
+          <StatusFilter
+            label="Volatility"
+            options={VOLATILITY_OPTIONS}
+            value={volatilityLevel}
+            onChange={setVolatilityLevel}
           />
           <SearchFilter
             value={search}

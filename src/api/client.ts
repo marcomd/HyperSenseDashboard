@@ -107,6 +107,7 @@ function buildFilterParams(params?: ListFilterParams): string {
   if (params.symbol) searchParams.set('symbol', params.symbol);
   if (params.status) searchParams.set('status', params.status);
   if (params.operation) searchParams.set('operation', params.operation);
+  if (params.volatility_level) searchParams.set('volatility_level', params.volatility_level);
   if (params.search) searchParams.set('search', params.search);
   if (params.page) searchParams.set('page', params.page.toString());
   if (params.per_page) searchParams.set('per_page', params.per_page.toString());

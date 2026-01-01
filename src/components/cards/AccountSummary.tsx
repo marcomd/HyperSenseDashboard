@@ -1,10 +1,23 @@
-import { TrendingUp, TrendingDown, Wallet, DollarSign, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, DollarSign, AlertCircle, Activity, Info } from 'lucide-react';
 import clsx from 'clsx';
-import type { AccountSummary as AccountSummaryType } from '@/types';
+import type { AccountSummary as AccountSummaryType, VolatilityLevel } from '@/types';
+import { VolatilityBadge } from '@/components/common/VolatilityBadge';
+import { Tooltip } from '@/components/common/Tooltip';
 
 interface AccountSummaryProps {
   account: AccountSummaryType;
 }
+
+/** Label mapping for volatility levels */
+const VOLATILITY_LABELS: Record<VolatilityLevel, string> = {
+  very_high: 'Very High',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+};
+
+/** Order for displaying volatility levels (highest to lowest) */
+const VOLATILITY_ORDER: VolatilityLevel[] = ['very_high', 'high', 'medium', 'low'];
 
 export function AccountSummary({ account }: AccountSummaryProps) {
   const isProfitable = account.total_unrealized_pnl >= 0;
@@ -22,7 +35,7 @@ export function AccountSummary({ account }: AccountSummaryProps) {
         )}
       </div>
       <div className="card-body">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Open Positions */}
           <div className="bg-bg-tertiary/50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
@@ -82,6 +95,47 @@ export function AccountSummary({ account }: AccountSummaryProps) {
               )}
             >
               {todayProfitable ? '+' : ''}${account.realized_pnl_today.toFixed(2)}
+            </div>
+          </div>
+
+          {/* Volatility */}
+          <div className="bg-bg-tertiary/50 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
+              <Activity className="w-4 h-4" />
+              <span>Volatility</span>
+              <Tooltip
+                content={
+                  <div className="space-y-2">
+                    <p className="font-medium">How volatility affects trading:</p>
+                    <p className="text-slate-300 text-xs">
+                      The agent adjusts its reactivity based on market volatility.
+                      Higher volatility triggers more frequent analysis cycles.
+                    </p>
+                    {account.volatility_info?.intervals ? (
+                      <ul className="text-xs space-y-1 mt-2">
+                        {VOLATILITY_ORDER.map((level) => (
+                          <li key={level} className="flex justify-between gap-4">
+                            <span className="text-slate-300">{VOLATILITY_LABELS[level]}:</span>
+                            <span className="text-white font-medium">
+                              {account.volatility_info?.intervals?.[level]} min
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-slate-400 text-xs italic">
+                        Interval data not available
+                      </p>
+                    )}
+                  </div>
+                }
+                position="bottom"
+              >
+                <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help" />
+              </Tooltip>
+            </div>
+            <div className="text-2xl font-bold">
+              <VolatilityBadge level={account.volatility_info?.volatility_level ?? null} />
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import type {
   Operation,
   Direction,
   DecisionStatus,
+  VolatilityLevel,
 } from '@/types'
 
 let idCounter = 1
@@ -20,6 +21,9 @@ interface DecisionOverrides {
   stop_loss?: number | null
   take_profit?: number | null
   reasoning?: string | null
+  volatility_level?: VolatilityLevel | null
+  atr_value?: number | null
+  next_cycle_interval?: number | null
   llm_model?: string | null
   created_at?: string
 }
@@ -44,6 +48,9 @@ export function createDecision(overrides: DecisionOverrides = {}): TradingDecisi
     reasoning:
       overrides.reasoning ??
       'Strong bullish momentum with RSI breakout above 50 level.',
+    volatility_level: overrides.volatility_level === undefined ? 'medium' : overrides.volatility_level,
+    atr_value: overrides.atr_value === undefined ? 0.015 : overrides.atr_value,
+    next_cycle_interval: overrides.next_cycle_interval === undefined ? 12 : overrides.next_cycle_interval,
     llm_model: overrides.llm_model === undefined ? 'claude-sonnet-4-5' : overrides.llm_model,
     created_at: overrides.created_at ?? new Date().toISOString(),
   }

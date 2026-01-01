@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import type { TradingDecision } from '@/types';
+import { VolatilityBadge } from '@/components/common/VolatilityBadge';
 
 interface DecisionLogProps {
   decisions: TradingDecision[];
@@ -145,6 +146,9 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
               <span className="text-xs text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded">
                 {(decision.confidence * 100).toFixed(0)}% conf
               </span>
+            )}
+            {decision.volatility_level && (
+              <VolatilityBadge level={decision.volatility_level} size="sm" />
             )}
             {decision.llm_model && (
               <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">

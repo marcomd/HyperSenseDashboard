@@ -5,6 +5,57 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-01-01
+
+### Added
+- **Tooltip Component** - Reusable tooltip component for displaying contextual help
+  - `Tooltip` - Hover/focus tooltip with customizable position (top/bottom/left/right)
+  - Configurable delay, supports rich content (JSX)
+  - Accessible with keyboard (focus) and mouse (hover) interactions
+- **Volatility Info Tooltip** - Account Summary volatility card now shows info icon
+  - Hover reveals tooltip explaining how volatility affects trading reactivity
+  - Shows configured intervals for each level (very_high, high, medium, low)
+  - Intervals fetched from backend to avoid hardcoded values
+
+### Technical Details
+- New `VolatilityIntervals` type for interval configuration
+- `VolatilityInfo` interface extended with optional `intervals` field
+- Tests for Tooltip component and AccountSummary tooltip behavior
+
+### Supports Backend (0.25.0)
+
+## [0.8.0] - 2026-01-01
+
+### Added
+- **Volatility Display on Dashboard** - Multiple components now show ATR volatility info
+  - Color-coded volatility badge (green=low, yellow=medium, orange=high, red=very_high)
+  - `VolatilityBadge` - Reusable component with size prop (`sm`, `md`)
+- **Market Overview Volatility** - Each coin badge shows volatility level from latest decision
+- **System Status Next Cycle** - Next trading cycle timing moved here with dynamic threshold
+  - Shows interval and scheduled time (e.g., "12 min (at 14:30)")
+  - Trading Cycle status now uses expected interval + buffer instead of hardcoded 15min
+- **Recent Decisions Volatility** - DecisionLog shows volatility badge before LLM model
+- **Volatility Column on Decisions Page** - Shows volatility level after Status column
+- **Volatility Filter** - New dropdown filter on Decisions page
+
+### Changed
+- **Account Summary** - Shows only volatility badge (next cycle timing moved to System Status)
+  - Grid now 5 columns on large screens (was 4)
+- **Decisions Page** - Simplified table columns
+  - Model column moved to expandable detail section
+  - ATR value moved to expandable detail section
+  - Next Cycle column removed (timing now in System Status)
+  - Click row expand to view reasoning, model, ATR value
+
+### Technical Details
+- New TypeScript types: `VolatilityLevel`, `VolatilityInfo`, `SystemStatusWithVolatility`
+- Updated `TradingDecision`, `AccountSummary` interfaces
+- `VolatilityBadge` component with size prop for compact displays
+- `SystemStatus` accepts `volatilityInfo` prop for dynamic threshold calculation
+- `MarketOverview` accepts `recentDecisions` prop to derive per-symbol volatility
+
+### Supports Backend (0.24.0)
+
 ## [0.7.0] - 2025-12-31
 
 ### Changed

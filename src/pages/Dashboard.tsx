@@ -83,7 +83,7 @@ export function Dashboard() {
       <main className="flex-1 p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Market Overview - Top of dashboard */}
-          <MarketOverview market={market} />
+          <MarketOverview market={market} recentDecisions={recent_decisions} />
 
           {/* Main Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -99,7 +99,7 @@ export function Dashboard() {
             <div className="space-y-6">
               <CostSummaryCard costs={cost_summary} />
               <MacroStrategyCard strategy={macro_strategy} />
-              <SystemStatus status={system_status} />
+              <SystemStatus status={system_status} volatilityInfo={account.volatility_info} />
             </div>
           </div>
         </div>

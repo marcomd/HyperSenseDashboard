@@ -99,6 +99,38 @@ describe('DecisionLog', () => {
       expect(screen.queryByText('claude-sonnet-4-5')).not.toBeInTheDocument()
     })
 
+    it('displays volatility badge when present', () => {
+      render(<DecisionLog decisions={[createDecision({ volatility_level: 'high' })]} />)
+      expect(screen.getByText('High')).toBeInTheDocument()
+    })
+
+    it('displays volatility badge before llm_model', () => {
+      const { container } = render(
+        <DecisionLog decisions={[createDecision({ volatility_level: 'medium', llm_model: 'claude-sonnet-4-5' })]} />
+      )
+      // Both should be present
+      expect(screen.getByText('Medium')).toBeInTheDocument()
+      expect(screen.getByText('claude-sonnet-4-5')).toBeInTheDocument()
+      // Volatility badge should appear before model badge in DOM
+      const badges = container.querySelectorAll('.badge, [class*="bg-slate"]')
+      let volatilityIndex = -1
+      let modelIndex = -1
+      badges.forEach((badge, idx) => {
+        if (badge.textContent === 'Medium') volatilityIndex = idx
+        if (badge.textContent === 'claude-sonnet-4-5') modelIndex = idx
+      })
+      expect(volatilityIndex).toBeLessThan(modelIndex)
+    })
+
+    it('does not display volatility badge when null', () => {
+      render(<DecisionLog decisions={[createDecision({ volatility_level: null })]} />)
+      expect(screen.getByText('BTC')).toBeInTheDocument()
+      // Should not have any volatility badge
+      expect(screen.queryByText('High')).not.toBeInTheDocument()
+      expect(screen.queryByText('Medium')).not.toBeInTheDocument()
+      expect(screen.queryByText('Low')).not.toBeInTheDocument()
+    })
+
     it('displays rejection reason when rejected', () => {
       render(
         <DecisionLog

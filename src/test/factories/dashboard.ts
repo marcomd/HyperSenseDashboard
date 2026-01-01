@@ -5,6 +5,7 @@ import type {
   PerformanceData,
   PerformanceStats,
   EquityPoint,
+  VolatilityInfo,
 } from '@/types'
 import { createPosition } from './position'
 import { createDecision } from './decision'
@@ -22,6 +23,7 @@ interface AccountSummaryOverrides {
     daily_loss: number | null
     consecutive_losses: number | null
   }
+  volatility_info?: VolatilityInfo | null
 }
 
 export function createAccountSummary(
@@ -38,6 +40,16 @@ export function createAccountSummary(
       daily_loss: -50,
       consecutive_losses: 0,
     },
+    volatility_info: overrides.volatility_info === undefined
+      ? {
+          volatility_level: 'medium',
+          atr_value: 0.015,
+          next_cycle_interval: 12,
+          next_cycle_at: new Date(Date.now() + 12 * 60 * 1000).toISOString(),
+          last_decision_at: new Date().toISOString(),
+          intervals: { very_high: 3, high: 6, medium: 12, low: 25 },
+        }
+      : overrides.volatility_info,
   }
 }
 

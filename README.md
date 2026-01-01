@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.7.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.9.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 
@@ -98,16 +98,16 @@ src/
 
 ### Dashboard Cards
 
-| Component           | Description                                                  |
-| ------------------- | ------------------------------------------------------------ |
-| `AccountSummary`    | Open positions count, unrealized PnL, margin used, daily P&L |
-| `CostSummaryCard`   | Net P&L, trading fees, LLM costs, server costs breakdown     |
-| `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts            |
-| `PositionsTable`    | Open positions with entry, current price, gross/net PnL, SL/TP |
-| `EquityCurve`       | Cumulative PnL chart with win rate statistics                |
-| `MacroStrategyCard` | Market bias (bullish/bearish/neutral), narrative, key levels |
-| `DecisionLog`       | Recent trading decisions with status and reasoning           |
-| `SystemStatus`      | Health status of market data, trading cycle, macro strategy  |
+| Component           | Description                                                                         |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| `AccountSummary`    | Open positions, unrealized PnL, margin used, daily P&L, volatility badge            |
+| `CostSummaryCard`   | Net P&L, trading fees, LLM costs, server costs breakdown                            |
+| `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts, volatility badge per coin        |
+| `PositionsTable`    | Open positions with entry, current price, gross/net PnL, SL/TP                      |
+| `EquityCurve`       | Cumulative PnL chart with win rate statistics                                       |
+| `MacroStrategyCard` | Market bias (bullish/bearish/neutral), narrative, key levels                        |
+| `DecisionLog`       | Recent trading decisions with status, volatility, model, and reasoning              |
+| `SystemStatus`      | Health status of market data, trading cycle, macro strategy, next cycle timing      |
 
 ### Layout
 
@@ -128,10 +128,12 @@ src/
 
 ### Common Components
 
-| Component    | Description                                                       |
-| ------------ | ----------------------------------------------------------------- |
-| `DataTable`  | Generic table with loading skeleton, empty state, expandable rows |
-| `PageLayout` | Page wrapper with title, subtitle, back-to-dashboard link         |
+| Component         | Description                                                       |
+| ----------------- | ----------------------------------------------------------------- |
+| `DataTable`       | Generic table with loading skeleton, empty state, expandable rows |
+| `PageLayout`      | Page wrapper with title, subtitle, back-to-dashboard link         |
+| `Tooltip`         | Hover tooltip with customizable position and delay                |
+| `VolatilityBadge` | Color-coded badge for volatility level (low/medium/high/very_high)|
 
 ## How the UI Works
 

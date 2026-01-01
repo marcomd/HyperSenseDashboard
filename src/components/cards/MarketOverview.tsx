@@ -1,12 +1,27 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import clsx from 'clsx';
-import type { MarketOverview as MarketOverviewType } from '@/types';
+import type { MarketOverview as MarketOverviewType, TradingDecision, VolatilityLevel } from '@/types';
+import { VolatilityBadge } from '@/components/common/VolatilityBadge';
 
 interface MarketOverviewProps {
   market: Record<string, MarketOverviewType | null>;
+  recentDecisions?: TradingDecision[];
 }
 
-export function MarketOverview({ market }: MarketOverviewProps) {
+/**
+ * Gets the latest volatility level for a symbol from recent decisions.
+ * Returns the volatility_level from the most recent decision for that symbol.
+ */
+function getVolatilityForSymbol(
+  symbol: string,
+  recentDecisions?: TradingDecision[]
+): VolatilityLevel | null {
+  if (!recentDecisions?.length) return null;
+  const decision = recentDecisions.find((d) => d.symbol === symbol);
+  return decision?.volatility_level ?? null;
+}
+
+export function MarketOverview({ market, recentDecisions }: MarketOverviewProps) {
   const assets = Object.entries(market).filter(([, data]) => data !== null);
 
   if (assets.length === 0) {
@@ -32,7 +47,12 @@ export function MarketOverview({ market }: MarketOverviewProps) {
       <div className="card-body">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {assets.map(([symbol, data]) => (
-            <AssetCard key={symbol} symbol={symbol} data={data!} />
+            <AssetCard
+              key={symbol}
+              symbol={symbol}
+              data={data!}
+              volatilityLevel={getVolatilityForSymbol(symbol, recentDecisions)}
+            />
           ))}
         </div>
       </div>
@@ -40,7 +60,13 @@ export function MarketOverview({ market }: MarketOverviewProps) {
   );
 }
 
-function AssetCard({ symbol, data }: { symbol: string; data: MarketOverviewType }) {
+interface AssetCardProps {
+  symbol: string;
+  data: MarketOverviewType;
+  volatilityLevel?: VolatilityLevel | null;
+}
+
+function AssetCard({ symbol, data, volatilityLevel }: AssetCardProps) {
   const ForecastIcon = {
     bullish: TrendingUp,
     bearish: TrendingDown,
@@ -88,6 +114,13 @@ function AssetCard({ symbol, data }: { symbol: string; data: MarketOverviewType 
 
       {/* Indicators */}
       <div className="space-y-2 text-sm">
+        {/* Volatility */}
+        {volatilityLevel && (
+          <div className="flex items-center justify-between">
+            <span className="text-slate-400">Volatility</span>
+            <VolatilityBadge level={volatilityLevel} size="sm" />
+          </div>
+        )}
         {/* RSI */}
         <div className="flex items-center justify-between">
           <span className="text-slate-400">RSI</span>

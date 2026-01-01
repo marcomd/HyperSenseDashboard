@@ -1,12 +1,36 @@
-import { CheckCircle, XCircle, AlertTriangle, Clock, Server, Brain, BarChart3 } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Clock, Server, Brain, BarChart3, Timer } from 'lucide-react';
 import clsx from 'clsx';
-import type { SystemStatus as SystemStatusType } from '@/types';
+import type { SystemStatus as SystemStatusType, VolatilityInfo } from '@/types';
 
 interface SystemStatusProps {
   status: SystemStatusType;
+  volatilityInfo?: VolatilityInfo | null;
 }
 
-export function SystemStatus({ status }: SystemStatusProps) {
+/**
+ * Calculates the expected next cycle interval in minutes.
+ * Uses the expected interval from volatilityInfo if available, otherwise defaults to 5 minutes.
+ * Adds a buffer of 2 minutes for network/processing delays.
+ */
+function getExpectedCycleThreshold(volatilityInfo?: VolatilityInfo | null): number {
+  const baseInterval = volatilityInfo?.next_cycle_interval ?? 5;
+  const buffer = 2; // Allow 2 minutes of grace period
+  return baseInterval + buffer;
+}
+
+/**
+ * Formats the next cycle time for display.
+ */
+function formatNextCycleTime(volatilityInfo?: VolatilityInfo | null): string | null {
+  if (!volatilityInfo?.next_cycle_at) return null;
+  const nextAt = new Date(volatilityInfo.next_cycle_at);
+  return nextAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+export function SystemStatus({ status, volatilityInfo }: SystemStatusProps) {
+  const expectedThreshold = getExpectedCycleThreshold(volatilityInfo);
+  const nextCycleTime = formatNextCycleTime(volatilityInfo);
+
   return (
     <div className="card">
       <div className="card-header">
@@ -28,6 +52,7 @@ export function SystemStatus({ status }: SystemStatusProps) {
             label="Trading Cycle"
             healthy={status.trading_cycle.healthy}
             lastUpdate={status.trading_cycle.last_run}
+            thresholdMinutes={expectedThreshold}
           />
 
           {/* Macro Strategy */}
@@ -39,6 +64,20 @@ export function SystemStatus({ status }: SystemStatusProps) {
             stale={status.macro_strategy.stale ?? false}
           />
         </div>
+
+        {/* Next Trading Cycle */}
+        {volatilityInfo?.next_cycle_interval && (
+          <div className="mt-4 pt-4 border-t border-slate-700/50">
+            <div className="flex items-center gap-2 text-sm">
+              <Timer className="w-4 h-4 text-slate-400" />
+              <span className="text-slate-400">Next Trading Cycle:</span>
+              <span className="text-white font-medium">
+                {volatilityInfo.next_cycle_interval} min
+                {nextCycleTime && ` (at ${nextCycleTime})`}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Assets Being Tracked */}
         <div className="mt-4 pt-4 border-t border-slate-700/50">
@@ -65,26 +104,36 @@ function StatusItem({
   healthy,
   lastUpdate,
   stale = false,
+  thresholdMinutes,
 }: {
   icon: React.ReactNode;
   label: string;
   healthy: boolean;
   lastUpdate: string | null;
   stale?: boolean;
+  thresholdMinutes?: number;
 }) {
-  const StatusIcon = healthy
+  // Calculate if the item is overdue based on threshold
+  const isOverdue = lastUpdate && thresholdMinutes
+    ? getMinutesAgo(new Date(lastUpdate)) > thresholdMinutes
+    : false;
+
+  // Override healthy status if overdue
+  const effectiveHealthy = healthy && !isOverdue;
+
+  const StatusIcon = effectiveHealthy
     ? stale
       ? AlertTriangle
       : CheckCircle
     : XCircle;
 
-  const statusColor = healthy
+  const statusColor = effectiveHealthy
     ? stale
       ? 'text-yellow-400'
       : 'text-green-400'
     : 'text-red-400';
 
-  const bgColor = healthy
+  const bgColor = effectiveHealthy
     ? stale
       ? 'bg-yellow-500/10'
       : 'bg-green-500/10'
@@ -116,4 +165,11 @@ function getTimeAgo(date: Date): string {
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
+}
+
+/**
+ * Returns the number of minutes since the given date.
+ */
+function getMinutesAgo(date: Date): number {
+  return Math.floor((Date.now() - date.getTime()) / 1000 / 60);
 }

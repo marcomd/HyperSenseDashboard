@@ -170,7 +170,71 @@ describe('DecisionsPage', () => {
       expect(screen.getByText('close')).toBeInTheDocument()
     })
 
-    it('displays llm_model column', async () => {
+    it('displays volatility column', async () => {
+      server.use(
+        http.get('/api/v1/decisions', () => {
+          return HttpResponse.json({
+            decisions: [
+              createDecision({
+                id: 1,
+                symbol: 'BTC',
+                volatility_level: 'high',
+              }),
+            ],
+            meta: { page: 1, per_page: 25, total: 1, total_pages: 1 },
+          })
+        })
+      )
+
+      render(<DecisionsPage />, { initialEntries: ['/decisions'] })
+
+      await waitFor(() => {
+        expect(screen.getByText('BTC')).toBeInTheDocument()
+      })
+
+      // Check the Volatility column header
+      expect(screen.getByRole('columnheader', { name: 'Volatility' })).toBeInTheDocument()
+      // ATR and Next Cycle columns have been moved to expanded section
+      expect(screen.queryByRole('columnheader', { name: 'ATR' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('columnheader', { name: 'Next Cycle' })).not.toBeInTheDocument()
+    })
+
+    it('displays ATR in expanded section', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+
+      server.use(
+        http.get('/api/v1/decisions', () => {
+          return HttpResponse.json({
+            decisions: [
+              createDecision({
+                id: 1,
+                symbol: 'BTC',
+                atr_value: 0.025,
+              }),
+            ],
+            meta: { page: 1, per_page: 25, total: 1, total_pages: 1 },
+          })
+        })
+      )
+
+      render(<DecisionsPage />, { initialEntries: ['/decisions'] })
+
+      await waitFor(() => {
+        expect(screen.getByText('BTC')).toBeInTheDocument()
+      })
+
+      // Expand row to see ATR
+      const expandButton = screen.getByRole('button', { name: /expand row/i })
+      await user.click(expandButton)
+
+      // ATR should appear in expanded section
+      expect(screen.getByText('ATR Value')).toBeInTheDocument()
+      expect(screen.getByText('2.50%')).toBeInTheDocument()
+    })
+
+    it('displays llm_model in expanded section', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+
       server.use(
         http.get('/api/v1/decisions', () => {
           return HttpResponse.json({
@@ -188,32 +252,15 @@ describe('DecisionsPage', () => {
         expect(screen.getByText('BTC')).toBeInTheDocument()
       })
 
-      // Check the Model column header exists
-      expect(screen.getByText('Model')).toBeInTheDocument()
-      // Check the model value is displayed
+      // Model should NOT be in table columns (moved to expanded section)
+      expect(screen.queryByRole('columnheader', { name: 'Model' })).not.toBeInTheDocument()
+
+      // Expand row to see Model
+      const expandButton = screen.getByRole('button', { name: /expand row/i })
+      await user.click(expandButton)
+
+      // Model should appear in expanded section
       expect(screen.getByText('claude-sonnet-4-5')).toBeInTheDocument()
-    })
-
-    it('displays dash for null llm_model', async () => {
-      server.use(
-        http.get('/api/v1/decisions', () => {
-          return HttpResponse.json({
-            decisions: [
-              createDecision({ id: 1, symbol: 'BTC', llm_model: null }),
-            ],
-            meta: { page: 1, per_page: 25, total: 1, total_pages: 1 },
-          })
-        })
-      )
-
-      render(<DecisionsPage />, { initialEntries: ['/decisions'] })
-
-      await waitFor(() => {
-        expect(screen.getByText('BTC')).toBeInTheDocument()
-      })
-
-      // Check for dash placeholder when llm_model is null
-      expect(screen.getByText('-')).toBeInTheDocument()
     })
 
     it('displays empty state when no decisions', async () => {

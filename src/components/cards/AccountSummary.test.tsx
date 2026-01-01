@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@/test/test-utils'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { render, screen, fireEvent, act } from '@/test/test-utils'
 import { AccountSummary } from './AccountSummary'
 import { createAccountSummary } from '@/test/factories'
 
@@ -121,6 +121,113 @@ describe('AccountSummary', () => {
       )
       expect(screen.getByText('Consecutive Losses:')).toBeInTheDocument()
       expect(screen.getByText('3')).toBeInTheDocument()
+    })
+  })
+
+  describe('Volatility', () => {
+    it('displays Volatility label', () => {
+      render(<AccountSummary account={createAccountSummary()} />)
+      expect(screen.getByText('Volatility')).toBeInTheDocument()
+    })
+
+    it('displays volatility badge when volatility_info is present', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            volatility_info: {
+              volatility_level: 'high',
+              atr_value: 0.025,
+              next_cycle_interval: 6,
+              next_cycle_at: new Date().toISOString(),
+              last_decision_at: new Date().toISOString(),
+              intervals: { very_high: 3, high: 6, medium: 12, low: 25 },
+            },
+          })}
+        />
+      )
+      expect(screen.getByText('High')).toBeInTheDocument()
+    })
+
+    it('displays dash when volatility_info is null', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({ volatility_info: null })}
+        />
+      )
+      // VolatilityBadge renders "-" for null level
+      const volatilitySection = screen.getByText('Volatility').closest('div')?.parentElement
+      expect(volatilitySection?.textContent).toContain('-')
+    })
+
+    describe('Tooltip', () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
+      afterEach(() => {
+        vi.useRealTimers()
+      })
+
+      it('shows tooltip with intervals on hover', async () => {
+        render(
+          <AccountSummary
+            account={createAccountSummary({
+              volatility_info: {
+                volatility_level: 'medium',
+                atr_value: 0.015,
+                next_cycle_interval: 12,
+                next_cycle_at: new Date().toISOString(),
+                last_decision_at: new Date().toISOString(),
+                intervals: { very_high: 3, high: 6, medium: 12, low: 25 },
+              },
+            })}
+          />
+        )
+
+        // Find the info icon and hover over it
+        const infoIcon = document.querySelector('.cursor-help')
+        expect(infoIcon).toBeInTheDocument()
+
+        fireEvent.mouseEnter(infoIcon!)
+
+        act(() => {
+          vi.advanceTimersByTime(200)
+        })
+
+        // Tooltip content should be visible
+        expect(screen.getByRole('tooltip')).toBeInTheDocument()
+        expect(screen.getByText('How volatility affects trading:')).toBeInTheDocument()
+        expect(screen.getByText('3 min')).toBeInTheDocument()
+        expect(screen.getByText('6 min')).toBeInTheDocument()
+        expect(screen.getByText('12 min')).toBeInTheDocument()
+        expect(screen.getByText('25 min')).toBeInTheDocument()
+      })
+
+      it('shows fallback message when intervals not available', async () => {
+        render(
+          <AccountSummary
+            account={createAccountSummary({
+              volatility_info: {
+                volatility_level: 'medium',
+                atr_value: 0.015,
+                next_cycle_interval: 12,
+                next_cycle_at: new Date().toISOString(),
+                last_decision_at: new Date().toISOString(),
+                // No intervals provided
+              },
+            })}
+          />
+        )
+
+        const infoIcon = document.querySelector('.cursor-help')
+        fireEvent.mouseEnter(infoIcon!)
+
+        act(() => {
+          vi.advanceTimersByTime(200)
+        })
+
+        expect(screen.getByText('Interval data not available')).toBeInTheDocument()
+      })
     })
   })
 })
