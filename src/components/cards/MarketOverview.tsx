@@ -146,7 +146,7 @@ function AssetCard({ symbol, data, volatilityLevel }: AssetCardProps) {
           </span>
         </div>
 
-        {/* EMA Position */}
+        {/* EMA 50 Position */}
         <div className="flex items-center justify-between">
           <span className="text-slate-400">EMA 50</span>
           <span
@@ -161,6 +161,26 @@ function AssetCard({ symbol, data, volatilityLevel }: AssetCardProps) {
             {data.above_ema_50 === true
               ? 'Above'
               : data.above_ema_50 === false
+              ? 'Below'
+              : '-'}
+          </span>
+        </div>
+
+        {/* EMA 200 Position */}
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">EMA 200</span>
+          <span
+            className={
+              data.above_ema_200 === true
+                ? 'text-green-400'
+                : data.above_ema_200 === false
+                ? 'text-red-400'
+                : 'text-slate-500'
+            }
+          >
+            {data.above_ema_200 === true
+              ? 'Above'
+              : data.above_ema_200 === false
               ? 'Below'
               : '-'}
           </span>

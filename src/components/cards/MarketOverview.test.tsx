@@ -63,17 +63,34 @@ describe('MarketOverview', () => {
 
     it('displays Above for EMA 50 when price is above', () => {
       render(
-        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: true }) }} />
+        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: true, above_ema_200: false }) }} />
       )
       expect(screen.getByText('EMA 50')).toBeInTheDocument()
-      expect(screen.getByText('Above')).toBeInTheDocument()
+      // Check EMA 50 shows Above (EMA 200 set to false to avoid duplicate)
+      expect(screen.getAllByText('Above')).toHaveLength(1)
     })
 
     it('displays Below for EMA 50 when price is below', () => {
       render(
-        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: false }) }} />
+        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: false, above_ema_200: null }) }} />
       )
-      expect(screen.getByText('Below')).toBeInTheDocument()
+      expect(screen.getAllByText('Below')).toHaveLength(1)
+    })
+
+    it('displays Above for EMA 200 when price is above', () => {
+      render(
+        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: null, above_ema_200: true }) }} />
+      )
+      expect(screen.getByText('EMA 200')).toBeInTheDocument()
+      expect(screen.getAllByText('Above')).toHaveLength(1)
+    })
+
+    it('displays Below for EMA 200 when price is below', () => {
+      render(
+        <MarketOverview market={{ BTC: createMarketOverview({ above_ema_50: null, above_ema_200: false }) }} />
+      )
+      expect(screen.getByText('EMA 200')).toBeInTheDocument()
+      expect(screen.getAllByText('Below')).toHaveLength(1)
     })
   })
 
@@ -107,6 +124,7 @@ describe('MarketOverview', () => {
         rsi_signal: 'neutral' as const,
         macd_signal: 'bullish' as const,
         above_ema_50: true,
+        above_ema_200: true,
         forecast_direction: null,
         forecast_change_pct: null,
         updated_at: new Date().toISOString(),

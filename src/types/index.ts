@@ -102,8 +102,10 @@ export interface MarketAsset {
   ema_20: number | null;
   ema_50: number | null;
   ema_100: number | null;
+  ema_200: number | null;
   above_ema_20: boolean | null;
   above_ema_50: boolean | null;
+  above_ema_200: boolean | null;
   captured_at: string;
 }
 
@@ -184,6 +186,7 @@ export interface MarketOverview {
   rsi_signal: RsiSignal | null;
   macd_signal: MacdSignal | null;
   above_ema_50: boolean | null;
+  above_ema_200: boolean | null;
   forecast_direction: Bias | null;
   forecast_change_pct: number | null;
   updated_at: string;
@@ -290,6 +293,7 @@ export interface MarketSnapshot {
     ema_20?: number;
     ema_50?: number;
     ema_100?: number;
+    ema_200?: number;
     macd?: {
       value: number;
       signal: number;

@@ -5,6 +5,23 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.0] - 2026-01-02
+
+### Added
+- **EMA 200 Indicator Display** - MarketOverview card now shows EMA 200 position (Above/Below)
+  - Complements existing EMA 50 display for long-term trend analysis
+  - Helps identify bull/bear market structure at a glance
+
+### Changed
+- **Types** - Added `ema_200`, `above_ema_200` to `MarketAsset`, `MarketOverview`, and `MarketSnapshot` interfaces
+
+### Technical Details
+- `src/components/cards/MarketOverview.tsx` - Added EMA 200 row to asset cards
+- `src/types/index.ts` - Updated interfaces for EMA 200 support
+- `src/test/factories/marketData.ts` - Added `ema_200` and `above_ema_200` to factories
+
+### Supports Backend (0.33.0)
+
 ## [0.14.0] - 2026-01-02
 
 ### Added
