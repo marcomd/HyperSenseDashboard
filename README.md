@@ -2,6 +2,8 @@
 
 **Version 0.15.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
+![HyperSense_dashboard_cover1.jpg](docs/HyperSense_dashboard_cover1.png)
+
 ## Tech Stack
 
 - **React 19** - UI framework
@@ -106,9 +108,9 @@ src/
 
 | Component           | Description                                                                         |
 | ------------------- | ----------------------------------------------------------------------------------- |
-| `AccountSummary`    | Open positions, unrealized PnL, margin used, daily P&L, volatility badge            |
+| `AccountSummary`    | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
 | `CostSummaryCard`   | Net P&L, trading fees, LLM costs, server costs breakdown                            |
-| `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts, volatility badge per coin        |
+| `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts, per-coin volatility with ATR %   |
 | `PositionsTable`    | Open positions with entry, current price, gross/net PnL, SL/TP                      |
 | `EquityCurve`       | Cumulative PnL chart with win rate statistics                                       |
 | `MacroStrategyCard` | Market bias (bullish/bearish/neutral), narrative, key levels                        |
@@ -117,11 +119,11 @@ src/
 
 ### Layout
 
-| Component   | Description                                                                          |
-| ----------- | ------------------------------------------------------------------------------------ |
-| `AppLayout` | Unified layout shell wrapping all pages with Header and Footer                       |
-| `Header`    | App title, navigation menu, paper trading badge, trading status, WebSocket indicator |
-| `Footer`    | Version info (backend/frontend), environment badge, connection status, refresh button|
+| Component   | Description                                                                           |
+| ----------- | ------------------------------------------------------------------------------------- |
+| `AppLayout` | Unified layout shell wrapping all pages with Header and Footer                        |
+| `Header`    | App title, navigation menu, paper trading badge, trading status, WebSocket indicator  |
+| `Footer`    | Version info (backend/frontend), environment badge, connection status, refresh button |
 
 ### Filter Components
 
@@ -136,12 +138,12 @@ src/
 
 ### Common Components
 
-| Component         | Description                                                       |
-| ----------------- | ----------------------------------------------------------------- |
-| `DataTable`       | Generic table with loading skeleton, empty state, expandable rows |
-| `PageLayout`      | Page wrapper with title, subtitle, back-to-dashboard link         |
-| `Tooltip`         | Hover tooltip with customizable position and delay                |
-| `VolatilityBadge` | Color-coded badge for volatility level (low/medium/high/very_high)|
+| Component         | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| `DataTable`       | Generic table with loading skeleton, empty state, expandable rows  |
+| `PageLayout`      | Page wrapper with title, subtitle, back-to-dashboard link          |
+| `Tooltip`         | Hover tooltip with customizable position and delay                 |
+| `VolatilityBadge` | Color-coded badge for volatility level (low/medium/high/very_high) |
 
 ## How the UI Works
 
@@ -149,10 +151,10 @@ src/
 
 The application has two types of pages with different data fetching strategies:
 
-| Page Type        | Example Pages                                                        | Data Strategy               |
-| ---------------- | -------------------------------------------------------------------- | --------------------------- |
-| **Dashboard**    | `/` (Dashboard)                                                      | Real-time WebSocket updates |
-| **Detail Pages** | Decisions, Orders, Strategies, Forecasts, Snapshots, Balances        | REST API with pagination    |
+| Page Type        | Example Pages                                                 | Data Strategy               |
+| ---------------- | ------------------------------------------------------------- | --------------------------- |
+| **Dashboard**    | `/` (Dashboard)                                               | Real-time WebSocket updates |
+| **Detail Pages** | Decisions, Orders, Strategies, Forecasts, Snapshots, Balances | REST API with pagination    |
 
 ### Dashboard (Real-time)
 
@@ -175,11 +177,11 @@ Detail pages display historical, paginated data fetched via REST API. They inclu
 
 The header displays three status indicators:
 
-| Indicator             | States                                                        | Description                                                            |
-| --------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Paper Trading**     | Yellow badge (shown/hidden)                                   | Indicates sandbox mode based on `paper_trading` setting from backend   |
-| **Trading Status**    | Green "Trading Active" / Red "Trading Halted"                 | Reflects circuit breaker state - whether the system can execute trades |
-| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "Polling"     | WebSocket connection state (Dashboard) or polling mode (detail pages)  |
+| Indicator             | States                                                    | Description                                                            |
+| --------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Paper Trading**     | Yellow badge (shown/hidden)                               | Indicates sandbox mode based on `paper_trading` setting from backend   |
+| **Trading Status**    | Green "Trading Active" / Red "Trading Halted"             | Reflects circuit breaker state - whether the system can execute trades |
+| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "Polling" | WebSocket connection state (Dashboard) or polling mode (detail pages)  |
 
 #### Connection Status Explained
 
@@ -203,13 +205,13 @@ The circuit breaker is a safety mechanism that automatically halts trading when 
 
 The application uses React Router for client-side navigation:
 
-| Route               | Page                | Description                            |
-| ------------------- | ------------------- | -------------------------------------- |
-| `/`                 | Dashboard           | Main dashboard with real-time overview |
-| `/decisions`        | DecisionsPage       | Trading decisions history with filters |
-| `/macro-strategies` | MacroStrategiesPage | Macro strategies history with filters  |
-| `/forecasts`        | ForecastsPage       | Price forecasts history with filters   |
-| `/market-snapshots` | MarketSnapshotsPage | Market snapshots history with filters  |
+| Route               | Page                | Description                               |
+| ------------------- | ------------------- | ----------------------------------------- |
+| `/`                 | Dashboard           | Main dashboard with real-time overview    |
+| `/decisions`        | DecisionsPage       | Trading decisions history with filters    |
+| `/macro-strategies` | MacroStrategiesPage | Macro strategies history with filters     |
+| `/forecasts`        | ForecastsPage       | Price forecasts history with filters      |
+| `/market-snapshots` | MarketSnapshotsPage | Market snapshots history with filters     |
 | `/execution-logs`   | ExecutionLogsPage   | Execution logs with status/action filters |
 
 ### Detail Pages Features
