@@ -15,6 +15,14 @@ import type {
   CostsSummaryResponse,
   CostsLLMResponse,
   CostsTradingResponse,
+  Order,
+  OrderDetail,
+  OrdersStats,
+  OrderFilterParams,
+  AccountBalance,
+  AccountBalanceDetail,
+  AccountBalanceSummary,
+  AccountBalanceFilterParams,
 } from '@/types';
 
 // When accessed via tunnel, use the backend tunnel URL from env
@@ -291,6 +299,70 @@ export const costsApi = {
   getTrading: () => fetchApi<CostsTradingResponse>('/costs/trading'),
 };
 
+// Helper to build orders filter params
+function buildOrdersFilterParams(params?: OrderFilterParams): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  if (params.symbol) searchParams.set('symbol', params.symbol);
+  if (params.status) searchParams.set('status', params.status);
+  if (params.side) searchParams.set('side', params.side);
+  if (params.order_type) searchParams.set('order_type', params.order_type);
+  if (params.from) searchParams.set('from', params.from);
+  if (params.to) searchParams.set('to', params.to);
+  if (params.page) searchParams.set('page', params.page.toString());
+  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
+}
+
+// Orders API
+export const ordersApi = {
+  getAll: (params?: OrderFilterParams) => {
+    const query = buildOrdersFilterParams(params);
+    return fetchApi<{ orders: Order[]; meta: PaginationMeta }>(
+      `/orders${query}`
+    );
+  },
+
+  getById: (id: number) =>
+    fetchApi<{ order: OrderDetail }>(`/orders/${id}`),
+
+  getActive: () =>
+    fetchApi<{ orders: Order[] }>('/orders/active'),
+
+  getStats: (hours?: number) =>
+    fetchApi<OrdersStats>(`/orders/stats${hours ? `?hours=${hours}` : ''}`),
+};
+
+// Helper to build account balances filter params
+function buildAccountBalancesFilterParams(params?: AccountBalanceFilterParams): string {
+  if (!params) return '';
+  const searchParams = new URLSearchParams();
+  if (params.event_type) searchParams.set('event_type', params.event_type);
+  if (params.from) searchParams.set('from', params.from);
+  if (params.to) searchParams.set('to', params.to);
+  if (params.page) searchParams.set('page', params.page.toString());
+  if (params.per_page) searchParams.set('per_page', params.per_page.toString());
+  const query = searchParams.toString();
+  return query ? `?${query}` : '';
+}
+
+// Account Balances API
+export const accountBalancesApi = {
+  getAll: (params?: AccountBalanceFilterParams) => {
+    const query = buildAccountBalancesFilterParams(params);
+    return fetchApi<{ account_balances: AccountBalance[]; meta: PaginationMeta }>(
+      `/account_balances${query}`
+    );
+  },
+
+  getById: (id: number) =>
+    fetchApi<{ account_balance: AccountBalanceDetail }>(`/account_balances/${id}`),
+
+  getSummary: () =>
+    fetchApi<AccountBalanceSummary>('/account_balances/summary'),
+};
+
 // Export all APIs
 export const api = {
   health: healthApi,
@@ -303,6 +375,8 @@ export const api = {
   forecasts: forecastsApi,
   executionLogs: executionLogsApi,
   costs: costsApi,
+  orders: ordersApi,
+  accountBalances: accountBalancesApi,
 };
 
 export default api;

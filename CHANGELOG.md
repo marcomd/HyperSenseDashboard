@@ -5,6 +5,39 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0] - 2026-01-02
+
+### Added
+- **Orders Page** - New page to view and filter order history
+  - Filters: Symbol, Status, Side, Order Type, Date Range
+  - DataTable with columns: ID, Symbol, Side, Type, Size, Price, Status, Fill%, Submitted
+  - Expandable rows showing order details, fill info, and timestamps
+  - Pagination support
+- **Account Balances Page** - New page to view balance history and deposits/withdrawals
+  - Summary card: Initial Balance, Current Balance, Deposits, Withdrawals, Calculated P&L
+  - Filters: Event Type, Date Range
+  - DataTable with columns: ID, Event, Balance, Change, Notes, Recorded
+  - Expandable rows showing previous balance and source
+  - Pagination support
+- **Calculated P&L in Dashboard** - Account Summary now shows accurate P&L that excludes deposits/withdrawals
+  - Tooltip explaining the formula: `Current - Initial - Deposits + Withdrawals`
+  - Shows balance history breakdown in tooltip
+  - Link to Account Balances page when deposits/withdrawals exist
+- **New Navigation Links** - "Orders" and "Balances" added to header navigation
+
+### Changed
+- **AccountSummary Component** - Updated to display calculated_pnl instead of all_time_pnl when balance history available
+- **Types** - Added `Order`, `OrderDetail`, `OrdersStats`, `AccountBalance`, `AccountBalanceDetail`, `AccountBalanceSummary` interfaces
+
+### Technical Details
+- `src/pages/OrdersPage.tsx` - Orders history page with filters and pagination
+- `src/pages/AccountBalancesPage.tsx` - Balance history page with summary card
+- `src/api/client.ts` - Added `ordersApi` and `accountBalancesApi`
+- `src/hooks/useApi.ts` - Added orders and account balances hooks
+- `src/components/cards/AccountSummary.tsx` - Calculated P&L display with tooltip
+
+### Supports Backend (0.31.0)
+
 ## [0.13.0] - 2026-01-02
 
 ### Added

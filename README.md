@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.13.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.14.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 
@@ -86,10 +86,12 @@ src/
 ├── pages/
 │   ├── Dashboard.tsx             # Main dashboard page
 │   ├── DecisionsPage.tsx         # Trading decisions history
+│   ├── OrdersPage.tsx            # Order history with filters
 │   ├── MacroStrategiesPage.tsx   # Macro strategies history
 │   ├── ForecastsPage.tsx         # Price forecasts history
 │   ├── MarketSnapshotsPage.tsx   # Market snapshots history
 │   ├── ExecutionLogsPage.tsx     # Execution logs history
+│   ├── AccountBalancesPage.tsx   # Balance history with summary
 │   └── NotFoundPage.tsx          # 404 page
 ├── types/
 │   └── index.ts                  # TypeScript type definitions
@@ -147,10 +149,10 @@ src/
 
 The application has two types of pages with different data fetching strategies:
 
-| Page Type        | Example Pages                                      | Data Strategy               |
-| ---------------- | -------------------------------------------------- | --------------------------- |
-| **Dashboard**    | `/` (Dashboard)                                    | Real-time WebSocket updates |
-| **Detail Pages** | Decisions, Strategies, Forecasts, Market Snapshots | REST API with pagination    |
+| Page Type        | Example Pages                                                        | Data Strategy               |
+| ---------------- | -------------------------------------------------------------------- | --------------------------- |
+| **Dashboard**    | `/` (Dashboard)                                                      | Real-time WebSocket updates |
+| **Detail Pages** | Decisions, Orders, Strategies, Forecasts, Snapshots, Balances        | REST API with pagination    |
 
 ### Dashboard (Real-time)
 

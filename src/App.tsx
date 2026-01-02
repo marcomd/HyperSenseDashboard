@@ -7,6 +7,8 @@ import { MarketSnapshotsPage } from '@/pages/MarketSnapshotsPage';
 import { MacroStrategiesPage } from '@/pages/MacroStrategiesPage';
 import { DecisionsPage } from '@/pages/DecisionsPage';
 import { ExecutionLogsPage } from '@/pages/ExecutionLogsPage';
+import { OrdersPage } from '@/pages/OrdersPage';
+import { AccountBalancesPage } from '@/pages/AccountBalancesPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -28,6 +30,8 @@ export function AppRoutes() {
       <Route path="/macro-strategies" element={<MacroStrategiesPage />} />
       <Route path="/decisions" element={<DecisionsPage />} />
       <Route path="/execution-logs" element={<ExecutionLogsPage />} />
+      <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/account-balances" element={<AccountBalancesPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

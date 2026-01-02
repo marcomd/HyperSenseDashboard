@@ -5,6 +5,10 @@ export type Direction = 'long' | 'short';
 export type PositionStatus = 'open' | 'closing' | 'closed';
 export type DecisionStatus = 'pending' | 'approved' | 'rejected' | 'executed' | 'failed';
 export type Operation = 'open' | 'close' | 'hold';
+export type OrderStatus = 'pending' | 'submitted' | 'filled' | 'partially_filled' | 'cancelled' | 'failed';
+export type OrderSide = 'buy' | 'sell';
+export type OrderType = 'market' | 'limit' | 'stop_limit';
+export type AccountBalanceEventType = 'initial' | 'sync' | 'deposit' | 'withdrawal' | 'adjustment';
 export type RsiSignal = 'oversold' | 'overbought' | 'neutral';
 export type MacdSignal = 'bullish' | 'bearish';
 export type VolatilityLevel = 'very_high' | 'high' | 'medium' | 'low';
@@ -146,6 +150,14 @@ export interface HyperliquidAccount {
   configured: boolean;
 }
 
+// Balance history for accurate PnL calculation
+export interface BalanceHistory {
+  initial_balance: number | null;
+  total_deposits: number | null;
+  total_withdrawals: number | null;
+  last_sync: string | null;
+}
+
 export interface AccountSummary {
   open_positions_count: number;
   total_unrealized_pnl: number;
@@ -153,6 +165,8 @@ export interface AccountSummary {
   realized_pnl_today: number;
   total_realized_pnl: number;
   all_time_pnl: number;
+  calculated_pnl: number | null;
+  balance_history: BalanceHistory;
   paper_trading: boolean;
   circuit_breaker: {
     // Note: trading_allowed comes from TradingStatusContext (via /health endpoint)
@@ -443,4 +457,100 @@ export interface CostsTradingResponse {
     maker: number;
     current: string;
   };
+}
+
+// Order Types
+export interface Order {
+  id: number;
+  symbol: string;
+  side: OrderSide;
+  order_type: OrderType;
+  size: number;
+  price: number | null;
+  stop_price: number | null;
+  status: OrderStatus;
+  filled_size: number | null;
+  average_fill_price: number | null;
+  fill_percent: number;
+  hyperliquid_order_id: string | null;
+  submitted_at: string | null;
+  filled_at: string | null;
+  created_at: string;
+}
+
+export interface OrderDetail extends Order {
+  hyperliquid_response: Record<string, unknown>;
+  trading_decision_id: number | null;
+  position_id: number | null;
+  remaining_size: number;
+  updated_at: string;
+  trading_decision?: {
+    id: number;
+    operation: Operation;
+    direction: Direction | null;
+    confidence: number | null;
+  } | null;
+  position?: {
+    id: number;
+    symbol: string;
+    direction: Direction;
+    status: PositionStatus;
+  } | null;
+}
+
+export interface OrdersStats {
+  period_hours: number;
+  total_orders: number;
+  by_status: Record<string, number>;
+  by_symbol: Record<string, number>;
+  by_side: Record<string, number>;
+  by_type: Record<string, number>;
+  fill_rate: number;
+  active_count: number;
+  average_slippage_percent: number | null;
+}
+
+export interface OrderFilterParams extends ListFilterParams {
+  side?: OrderSide;
+  order_type?: OrderType;
+  from?: string;
+  to?: string;
+}
+
+// Account Balance Types
+export interface AccountBalance {
+  id: number;
+  balance: number;
+  previous_balance: number | null;
+  delta: number | null;
+  event_type: AccountBalanceEventType;
+  source: string;
+  notes: string | null;
+  recorded_at: string;
+  created_at: string;
+}
+
+export interface AccountBalanceDetail extends AccountBalance {
+  hyperliquid_data: Record<string, unknown>;
+  updated_at: string;
+}
+
+export interface AccountBalanceSummary {
+  initial_balance: number | null;
+  current_balance: number | null;
+  total_deposits: number | null;
+  total_withdrawals: number | null;
+  calculated_pnl: number | null;
+  last_sync: string | null;
+  record_count: number;
+  deposits_count: number;
+  withdrawals_count: number;
+}
+
+export interface AccountBalanceFilterParams {
+  event_type?: AccountBalanceEventType;
+  from?: string;
+  to?: string;
+  page?: number;
+  per_page?: number;
 }

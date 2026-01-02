@@ -15,10 +15,12 @@ interface HeaderProps {
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard' },
   { to: '/decisions', label: 'Decisions' },
+  { to: '/orders', label: 'Orders' },
   { to: '/macro-strategies', label: 'Strategies' },
   { to: '/forecasts', label: 'Forecasts' },
   { to: '/market-snapshots', label: 'Snapshots' },
   { to: '/execution-logs', label: 'Exec Logs' },
+  { to: '/account-balances', label: 'Balances' },
 ];
 
 export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: HeaderProps) {

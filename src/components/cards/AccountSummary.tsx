@@ -1,5 +1,6 @@
-import { TrendingUp, TrendingDown, Wallet, AlertCircle, Activity, Info, Building2, TestTube } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, AlertCircle, Activity, Info, Building2, TestTube, Calculator, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 import type { AccountSummary as AccountSummaryType, VolatilityLevel } from '@/types';
 import { VolatilityBadge } from '@/components/common/VolatilityBadge';
 import { Tooltip } from '@/components/common/Tooltip';
@@ -25,6 +26,8 @@ export function AccountSummary({ account }: AccountSummaryProps) {
   const isProfitable = account.total_unrealized_pnl >= 0;
   const todayProfitable = account.realized_pnl_today >= 0;
   const allTimeProfitable = account.all_time_pnl >= 0;
+  const calculatedPnlProfitable = (account.calculated_pnl ?? 0) >= 0;
+  const hasBalanceHistory = account.balance_history?.initial_balance !== null;
 
   return (
     <div className="card">
@@ -91,23 +94,72 @@ export function AccountSummary({ account }: AccountSummaryProps) {
             </div>
           </div>
 
-          {/* All-Time PnL */}
+          {/* Calculated PnL - Primary metric if available */}
           <div className="bg-bg-tertiary/50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
-              {allTimeProfitable ? (
+              {hasBalanceHistory ? (
+                calculatedPnlProfitable ? (
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                ) : (
+                  <TrendingDown className="w-4 h-4 text-red-400" />
+                )
+              ) : allTimeProfitable ? (
                 <TrendingUp className="w-4 h-4 text-green-400" />
               ) : (
                 <TrendingDown className="w-4 h-4 text-red-400" />
               )}
-              <span>All-Time P&L</span>
+              <span>{hasBalanceHistory ? 'Calculated P&L' : 'All-Time P&L'}</span>
+              {hasBalanceHistory && (
+                <Tooltip
+                  content={
+                    <div className="space-y-2">
+                      <p className="font-medium">Accurate P&L Calculation</p>
+                      <p className="text-slate-300 text-xs">
+                        Accounts for deposits and withdrawals to show true trading performance.
+                      </p>
+                      <div className="text-xs space-y-1 mt-2 font-mono bg-slate-800 p-2 rounded">
+                        <div>= Current Balance - Initial Capital</div>
+                        <div>- Total Deposits + Total Withdrawals</div>
+                      </div>
+                      {account.balance_history && (
+                        <div className="text-xs space-y-1 mt-2 border-t border-slate-600 pt-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Initial:</span>
+                            <span>${account.balance_history.initial_balance?.toFixed(2) ?? '-'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Deposits:</span>
+                            <span className="text-green-400">
+                              +${account.balance_history.total_deposits?.toFixed(2) ?? '0'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">Withdrawals:</span>
+                            <span className="text-red-400">
+                              -${account.balance_history.total_withdrawals?.toFixed(2) ?? '0'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  }
+                  position="bottom"
+                >
+                  <Calculator className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help" />
+                </Tooltip>
+              )}
             </div>
             <div
               className={clsx(
                 'text-2xl font-bold',
-                allTimeProfitable ? 'text-green-400' : 'text-red-400'
+                hasBalanceHistory
+                  ? calculatedPnlProfitable ? 'text-green-400' : 'text-red-400'
+                  : allTimeProfitable ? 'text-green-400' : 'text-red-400'
               )}
             >
-              {allTimeProfitable ? '+' : ''}${account.all_time_pnl.toFixed(2)}
+              {hasBalanceHistory
+                ? `${calculatedPnlProfitable ? '+' : ''}$${(account.calculated_pnl ?? 0).toFixed(2)}`
+                : `${allTimeProfitable ? '+' : ''}$${account.all_time_pnl.toFixed(2)}`}
             </div>
           </div>
 
@@ -194,6 +246,40 @@ export function AccountSummary({ account }: AccountSummaryProps) {
                   </span>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Balance History Summary */}
+        {hasBalanceHistory && (account.balance_history?.total_deposits || account.balance_history?.total_withdrawals) && (
+          <div className="mt-4 pt-4 border-t border-slate-700/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm">
+                {account.balance_history?.total_deposits !== null && account.balance_history.total_deposits > 0 && (
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <ArrowUpCircle className="w-4 h-4 text-green-400" />
+                    <span>Deposits:</span>
+                    <span className="text-green-400 font-medium">
+                      +${account.balance_history.total_deposits.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+                {account.balance_history?.total_withdrawals !== null && account.balance_history.total_withdrawals > 0 && (
+                  <div className="flex items-center gap-1.5 text-slate-400">
+                    <ArrowDownCircle className="w-4 h-4 text-red-400" />
+                    <span>Withdrawals:</span>
+                    <span className="text-red-400 font-medium">
+                      -${account.balance_history.total_withdrawals.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Link
+                to="/account-balances"
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                View Balance History →
+              </Link>
             </div>
           </div>
         )}

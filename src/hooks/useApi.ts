@@ -11,7 +11,7 @@ import type {
   MarketOverview,
 } from '@/types';
 
-import type { ListFilterParams } from '@/types';
+import type { ListFilterParams, OrderFilterParams, AccountBalanceFilterParams } from '@/types';
 
 // Query keys
 export const queryKeys = {
@@ -54,6 +54,19 @@ export const queryKeys = {
     all: ['macroStrategy'] as const,
     list: (params?: ListFilterParams) => ['macroStrategy', 'list', params] as const,
     byId: (id: number) => ['macroStrategy', id] as const,
+  },
+  orders: {
+    all: ['orders'] as const,
+    list: (params?: OrderFilterParams) => ['orders', 'list', params] as const,
+    active: ['orders', 'active'] as const,
+    byId: (id: number) => ['orders', id] as const,
+    stats: (hours?: number) => ['orders', 'stats', hours] as const,
+  },
+  accountBalances: {
+    all: ['accountBalances'] as const,
+    list: (params?: AccountBalanceFilterParams) => ['accountBalances', 'list', params] as const,
+    summary: ['accountBalances', 'summary'] as const,
+    byId: (id: number) => ['accountBalances', id] as const,
   },
 };
 
@@ -297,5 +310,60 @@ export function useExecutionLogsStats(hours = 24) {
   return useQuery({
     queryKey: queryKeys.executionLogs.stats(hours),
     queryFn: () => api.executionLogs.getStats(hours),
+  });
+}
+
+// Orders hooks
+export function useOrdersList(params?: OrderFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.orders.list(params),
+    queryFn: () => api.orders.getAll(params),
+  });
+}
+
+export function useActiveOrders() {
+  return useQuery({
+    queryKey: queryKeys.orders.active,
+    queryFn: () => api.orders.getActive(),
+    refetchInterval: 15000, // Refresh every 15s for active orders
+  });
+}
+
+export function useOrder(id: number) {
+  return useQuery({
+    queryKey: queryKeys.orders.byId(id),
+    queryFn: () => api.orders.getById(id),
+    enabled: !!id,
+  });
+}
+
+export function useOrdersStats(hours = 24) {
+  return useQuery({
+    queryKey: queryKeys.orders.stats(hours),
+    queryFn: () => api.orders.getStats(hours),
+  });
+}
+
+// Account Balances hooks
+export function useAccountBalancesList(params?: AccountBalanceFilterParams) {
+  return useQuery({
+    queryKey: queryKeys.accountBalances.list(params),
+    queryFn: () => api.accountBalances.getAll(params),
+  });
+}
+
+export function useAccountBalanceSummary() {
+  return useQuery({
+    queryKey: queryKeys.accountBalances.summary,
+    queryFn: () => api.accountBalances.getSummary(),
+    refetchInterval: 60000, // Refresh every minute
+  });
+}
+
+export function useAccountBalance(id: number) {
+  return useQuery({
+    queryKey: queryKeys.accountBalances.byId(id),
+    queryFn: () => api.accountBalances.getById(id),
+    enabled: !!id,
   });
 }
