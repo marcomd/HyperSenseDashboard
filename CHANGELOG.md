@@ -5,6 +5,29 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-01-02
+
+### Added
+- **Tunnel Configuration via Environment Variables** - Configurable remote access for development
+  - `VITE_BACKEND_TUNNEL_URL` - Backend tunnel URL for API and WebSocket connections
+  - `VITE_ALLOWED_HOSTS` - Comma-separated list of allowed hosts for Vite dev server
+  - `.env.example` - Template file documenting all environment variables
+
+### Changed
+- **Dynamic Backend URL Detection** - API client and WebSocket hook now detect tunnel access
+  - When not on localhost, uses `VITE_BACKEND_TUNNEL_URL` for backend connections
+  - Automatically matches protocol (http/https, ws/wss) to avoid mixed content issues
+- **Vite Config Refactored** - Uses `loadEnv` for environment-aware configuration
+  - `allowedHosts` now configurable via environment instead of hardcoded
+
+### Technical Details
+- `vite.config.ts` - Refactored to use `defineConfig` callback with `loadEnv`
+- `src/api/client.ts` - Uses `import.meta.env.VITE_BACKEND_TUNNEL_URL`
+- `src/hooks/useWebSocket.ts` - Uses `import.meta.env.VITE_BACKEND_TUNNEL_URL`
+- `src/vite-env.d.ts` - TypeScript declarations for new env variables
+
+### Supports Backend (0.28.0)
+
 ## [0.11.0] - 2026-01-01
 
 ### Added

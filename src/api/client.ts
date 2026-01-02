@@ -17,7 +17,17 @@ import type {
   CostsTradingResponse,
 } from '@/types';
 
-const API_BASE = '/api/v1';
+// When accessed via tunnel, use the backend tunnel URL from env
+const getApiBase = () => {
+  const backendTunnelUrl = import.meta.env.VITE_BACKEND_TUNNEL_URL;
+  // If we're not on localhost and have a backend tunnel URL configured, use it
+  if (backendTunnelUrl && !window.location.hostname.includes('localhost')) {
+    return `${backendTunnelUrl}/api/v1`;
+  }
+  return '/api/v1';
+};
+
+const API_BASE = getApiBase();
 
 // Health check response type
 export interface HealthResponse {

@@ -11,7 +11,16 @@ interface UseWebSocketOptions {
 }
 
 // WebSocket URL - in development, Vite proxies this to the Rails server
+// When accessed via tunnel, connect directly to the backend tunnel
 const getWebSocketUrl = () => {
+  const backendTunnelUrl = import.meta.env.VITE_BACKEND_TUNNEL_URL;
+  // If we're not on localhost and have a backend tunnel URL configured, use it
+  if (backendTunnelUrl && !window.location.hostname.includes('localhost')) {
+    // Convert http(s) to ws(s)
+    const wsUrl = backendTunnelUrl.replace(/^http/, 'ws');
+    return `${wsUrl}/cable`;
+  }
+  // Local development - use Vite proxy
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${window.location.host}/cable`;
 };
