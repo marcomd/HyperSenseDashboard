@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, Wallet, DollarSign, AlertCircle, Activity, Info } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, AlertCircle, Activity, Info, Building2, TestTube } from 'lucide-react';
 import clsx from 'clsx';
 import type { AccountSummary as AccountSummaryType, VolatilityLevel } from '@/types';
 import { VolatilityBadge } from '@/components/common/VolatilityBadge';
@@ -24,11 +24,20 @@ export function AccountSummary({ account }: AccountSummaryProps) {
   const { tradingAllowed } = useTradingStatus();
   const isProfitable = account.total_unrealized_pnl >= 0;
   const todayProfitable = account.realized_pnl_today >= 0;
+  const allTimeProfitable = account.all_time_pnl >= 0;
 
   return (
     <div className="card">
       <div className="card-header flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">Account Summary</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-white">Account Summary</h2>
+          {account.testnet_mode && (
+            <div className="badge bg-yellow-500/20 text-yellow-400">
+              <TestTube className="w-3 h-3 mr-1" />
+              Testnet
+            </div>
+          )}
+        </div>
         {!tradingAllowed && (
           <div className="badge bg-red-500/20 text-red-400">
             <AlertCircle className="w-3 h-3 mr-1" />
@@ -37,7 +46,20 @@ export function AccountSummary({ account }: AccountSummaryProps) {
         )}
       </div>
       <div className="card-body">
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+          {/* Exchange Balance */}
+          <div className="bg-bg-tertiary/50 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
+              <Building2 className="w-4 h-4" />
+              <span>Exchange Balance</span>
+            </div>
+            <div className="text-2xl font-bold text-white">
+              {account.hyperliquid?.configured && account.hyperliquid.balance !== null
+                ? `$${account.hyperliquid.balance.toFixed(2)}`
+                : '-'}
+            </div>
+          </div>
+
           {/* Open Positions */}
           <div className="bg-bg-tertiary/50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
@@ -69,14 +91,23 @@ export function AccountSummary({ account }: AccountSummaryProps) {
             </div>
           </div>
 
-          {/* Margin Used */}
+          {/* All-Time PnL */}
           <div className="bg-bg-tertiary/50 rounded-lg p-4">
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
-              <DollarSign className="w-4 h-4" />
-              <span>Margin Used</span>
+              {allTimeProfitable ? (
+                <TrendingUp className="w-4 h-4 text-green-400" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-red-400" />
+              )}
+              <span>All-Time P&L</span>
             </div>
-            <div className="text-2xl font-bold text-white">
-              ${account.total_margin_used.toFixed(2)}
+            <div
+              className={clsx(
+                'text-2xl font-bold',
+                allTimeProfitable ? 'text-green-400' : 'text-red-400'
+              )}
+            >
+              {allTimeProfitable ? '+' : ''}${account.all_time_pnl.toFixed(2)}
             </div>
           </div>
 

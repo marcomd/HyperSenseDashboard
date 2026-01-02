@@ -6,6 +6,7 @@ import type {
   PerformanceStats,
   EquityPoint,
   VolatilityInfo,
+  HyperliquidAccount,
 } from '@/types'
 import { createPosition } from './position'
 import { createDecision } from './decision'
@@ -17,12 +18,16 @@ interface AccountSummaryOverrides {
   total_unrealized_pnl?: number
   total_margin_used?: number
   realized_pnl_today?: number
+  total_realized_pnl?: number
+  all_time_pnl?: number
   paper_trading?: boolean
   circuit_breaker?: {
     daily_loss: number | null
     consecutive_losses: number | null
   }
   volatility_info?: VolatilityInfo | null
+  hyperliquid?: HyperliquidAccount
+  testnet_mode?: boolean
 }
 
 export function createAccountSummary(
@@ -33,6 +38,8 @@ export function createAccountSummary(
     total_unrealized_pnl: overrides.total_unrealized_pnl ?? 150.0,
     total_margin_used: overrides.total_margin_used ?? 980.0,
     realized_pnl_today: overrides.realized_pnl_today ?? 75.5,
+    total_realized_pnl: overrides.total_realized_pnl ?? 425.0,
+    all_time_pnl: overrides.all_time_pnl ?? 575.0,
     paper_trading: overrides.paper_trading ?? true,
     circuit_breaker: overrides.circuit_breaker ?? {
       daily_loss: -50,
@@ -48,6 +55,14 @@ export function createAccountSummary(
           intervals: { very_high: 3, high: 6, medium: 12, low: 25 },
         }
       : overrides.volatility_info,
+    hyperliquid: overrides.hyperliquid ?? {
+      balance: 947.06,
+      available_margin: 850.0,
+      margin_used: 97.06,
+      positions_count: 2,
+      configured: true,
+    },
+    testnet_mode: overrides.testnet_mode ?? true,
   }
 }
 

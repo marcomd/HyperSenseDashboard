@@ -5,6 +5,30 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-01-02
+
+### Added
+- **Exchange Balance Display** - Account Summary now shows actual balance from Hyperliquid exchange
+  - "Exchange Balance" card displays `hyperliquid.balance` from API
+  - Shows "-" when Hyperliquid is not configured
+- **All-Time PnL Display** - New card showing total realized + unrealized profit/loss
+  - Replaces "Margin Used" card with more useful PnL tracking
+  - Color-coded green (profit) / red (loss)
+- **Testnet Mode Indicator** - Yellow badge in Account Summary header when using testnet
+  - Helps distinguish testnet from mainnet at a glance
+
+### Changed
+- **Account Summary Layout** - Updated grid to 6 columns on large screens
+  - Exchange Balance, Open Positions, Unrealized PnL, All-Time P&L, Today's P&L, Volatility
+- **TypeScript Types** - Added `HyperliquidAccount` interface and new `AccountSummary` fields
+
+### Technical Details
+- `src/types/index.ts` - Added `HyperliquidAccount` interface
+- `src/components/cards/AccountSummary.tsx` - New Exchange Balance and All-Time PnL cards
+- `src/test/factories/dashboard.ts` - Updated factories with new fields
+
+### Supports Backend (0.29.0)
+
 ## [0.12.0] - 2026-01-02
 
 ### Added

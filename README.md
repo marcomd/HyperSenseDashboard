@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.12.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.13.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ## Tech Stack
 

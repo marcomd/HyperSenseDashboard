@@ -39,10 +39,73 @@ describe('AccountSummary', () => {
     })
   })
 
-  it('displays margin used', () => {
-    render(<AccountSummary account={createAccountSummary({ total_margin_used: 980.0 })} />)
-    expect(screen.getByText('$980.00')).toBeInTheDocument()
-    expect(screen.getByText('Margin Used')).toBeInTheDocument()
+  describe('Exchange Balance', () => {
+    it('displays exchange balance when configured', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            hyperliquid: {
+              balance: 947.06,
+              available_margin: 850.0,
+              margin_used: 97.06,
+              positions_count: 2,
+              configured: true,
+            },
+          })}
+        />
+      )
+      expect(screen.getByText('Exchange Balance')).toBeInTheDocument()
+      expect(screen.getByText('$947.06')).toBeInTheDocument()
+    })
+
+    it('displays dash when not configured', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            hyperliquid: {
+              balance: null,
+              available_margin: null,
+              margin_used: null,
+              positions_count: null,
+              configured: false,
+            },
+          })}
+        />
+      )
+      expect(screen.getByText('Exchange Balance')).toBeInTheDocument()
+      // Find the Exchange Balance card and check it contains a dash
+      const balanceCard = screen.getByText('Exchange Balance').closest('div')?.parentElement
+      expect(balanceCard?.textContent).toContain('-')
+    })
+  })
+
+  describe('Testnet Mode', () => {
+    it('displays Testnet badge when in testnet mode', () => {
+      render(<AccountSummary account={createAccountSummary({ testnet_mode: true })} />)
+      expect(screen.getByText('Testnet')).toBeInTheDocument()
+    })
+
+    it('hides Testnet badge when not in testnet mode', () => {
+      render(<AccountSummary account={createAccountSummary({ testnet_mode: false })} />)
+      expect(screen.queryByText('Testnet')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('All-Time P&L', () => {
+    it('displays positive all-time PnL with plus sign and green color', () => {
+      render(<AccountSummary account={createAccountSummary({ all_time_pnl: 575.0 })} />)
+      expect(screen.getByText('All-Time P&L')).toBeInTheDocument()
+      const pnlElement = screen.getByText('+$575.00')
+      expect(pnlElement).toBeInTheDocument()
+      expect(pnlElement).toHaveClass('text-green-400')
+    })
+
+    it('displays negative all-time PnL without plus sign and red color', () => {
+      render(<AccountSummary account={createAccountSummary({ all_time_pnl: -51.93 })} />)
+      const pnlElement = screen.getByText('$-51.93')
+      expect(pnlElement).toBeInTheDocument()
+      expect(pnlElement).toHaveClass('text-red-400')
+    })
   })
 
   describe("Today's P&L", () => {

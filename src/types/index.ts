@@ -137,11 +137,22 @@ export interface DashboardData {
   cost_summary: CostSummary;
 }
 
+// Hyperliquid account data from exchange API
+export interface HyperliquidAccount {
+  balance: number | null;
+  available_margin: number | null;
+  margin_used: number | null;
+  positions_count: number | null;
+  configured: boolean;
+}
+
 export interface AccountSummary {
   open_positions_count: number;
   total_unrealized_pnl: number;
   total_margin_used: number;
   realized_pnl_today: number;
+  total_realized_pnl: number;
+  all_time_pnl: number;
   paper_trading: boolean;
   circuit_breaker: {
     // Note: trading_allowed comes from TradingStatusContext (via /health endpoint)
@@ -149,6 +160,8 @@ export interface AccountSummary {
     consecutive_losses: number | null;
   };
   volatility_info: VolatilityInfo | null;
+  hyperliquid: HyperliquidAccount;
+  testnet_mode: boolean;
 }
 
 export interface MarketOverview {
