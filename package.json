@@ -19,7 +19,7 @@
   "dependencies": {
     "@rails/actioncable": "^8.1.100",
     "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/react-query": "^5.90.12",
+    "@tanstack/react-query": "^5.90.16",
     "@testing-library/dom": "^10.4.1",
     "clsx": "^2.1.1",
     "lightweight-charts": "^5.1.0",
