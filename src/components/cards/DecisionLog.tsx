@@ -118,12 +118,12 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
   const timeAgo = getTimeAgo(createdAt);
 
   return (
-    <div className="bg-bg-tertiary/50 rounded-lg p-3 animate-fade-in">
-      <div className="flex items-start gap-3">
+    <div className="bg-bg-tertiary/50 rounded-lg p-2 sm:p-3 animate-fade-in">
+      <div className="flex items-start gap-2 sm:gap-3">
         {/* Operation Icon */}
         <div
           className={clsx(
-            'p-2 rounded-lg flex-shrink-0',
+            'p-1.5 sm:p-2 rounded-lg flex-shrink-0',
             decision.operation === 'hold'
               ? 'bg-slate-500/20'
               : decision.direction === 'long'
@@ -136,25 +136,38 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-medium text-white">{decision.symbol}</span>
-            <span className={clsx('text-sm capitalize', operationColor)}>
-              {decision.operation}
-              {decision.direction && ` ${decision.direction}`}
-            </span>
-            {decision.confidence !== null && (
-              <span className="text-xs text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded">
-                {(decision.confidence * 100).toFixed(0)}% conf
+          {/* First row: metadata badges + status/time on mobile */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <span className="font-medium text-white">{decision.symbol}</span>
+              <span className={clsx('text-sm capitalize', operationColor)}>
+                {decision.operation}
+                {decision.direction && ` ${decision.direction}`}
               </span>
-            )}
-            {decision.volatility_level && (
-              <VolatilityBadge level={decision.volatility_level} size="sm" />
-            )}
-            {decision.llm_model && (
-              <span className="text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
-                {decision.llm_model}
-              </span>
-            )}
+              {decision.confidence !== null && (
+                <span className="text-xs text-slate-400 bg-slate-700/50 px-1.5 sm:px-2 py-0.5 rounded">
+                  {(decision.confidence * 100).toFixed(0)}%
+                </span>
+              )}
+              {decision.volatility_level && (
+                <VolatilityBadge level={decision.volatility_level} size="sm" />
+              )}
+              {decision.llm_model && (
+                <span className="hidden sm:inline text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
+                  {decision.llm_model}
+                </span>
+              )}
+            </div>
+
+            {/* Status and Time - inline on mobile */}
+            <div className="flex sm:hidden items-center gap-1.5 flex-shrink-0 text-xs">
+              <div className={clsx('flex items-center gap-1', statusColor)}>
+                <StatusIcon className="w-3 h-3" />
+                <span className="capitalize">{decision.status}</span>
+              </div>
+              <span className="text-slate-500">·</span>
+              <span className="text-slate-500">{timeAgo}</span>
+            </div>
           </div>
 
           {/* Reasoning with expand/collapse */}
@@ -174,8 +187,8 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
           )}
         </div>
 
-        {/* Status and Time */}
-        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+        {/* Status and Time - desktop only */}
+        <div className="hidden sm:flex flex-col items-end gap-1 flex-shrink-0">
           <div className={clsx('flex items-center gap-1 text-xs', statusColor)}>
             <StatusIcon className="w-3 h-3" />
             <span className="capitalize">{decision.status}</span>

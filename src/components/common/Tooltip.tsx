@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, useEffect, useCallback, type ReactNode } from 'react';
 import clsx from 'clsx';
 
 type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
@@ -6,18 +6,20 @@ type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 interface TooltipProps {
   /** Content to display inside the tooltip */
   content: ReactNode;
-  /** Element that triggers the tooltip on hover */
+  /** Element that triggers the tooltip on hover/tap */
   children: ReactNode;
   /** Position of the tooltip relative to the trigger element */
   position?: TooltipPosition;
   /** Additional CSS classes for the tooltip container */
   className?: string;
-  /** Delay in ms before showing tooltip (default: 200) */
+  /** Delay in ms before showing tooltip on hover (default: 200) */
   delay?: number;
 }
 
 /**
- * A reusable tooltip component that displays content on hover.
+ * A reusable tooltip component that displays content on hover or tap.
+ * Supports both mouse (hover) and touch (tap) interactions.
+ * On touch devices, tap to open and tap outside to close.
  *
  * @example
  * <Tooltip content="This is helpful info">
@@ -41,6 +43,7 @@ export function Tooltip({
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   const showTooltip = () => {
@@ -56,6 +59,35 @@ export function Tooltip({
     }
     setIsVisible(false);
   };
+
+  /** Toggle tooltip visibility on click/tap (for touch devices) */
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsVisible((prev) => !prev);
+    // Clear any pending hover timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
+  /** Close tooltip when clicking outside (for touch devices) */
+  const handleClickOutside = useCallback((e: MouseEvent | TouchEvent) => {
+    if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      setIsVisible(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isVisible, handleClickOutside]);
 
   useEffect(() => {
     return () => {
@@ -81,11 +113,13 @@ export function Tooltip({
 
   return (
     <div
-      className="relative inline-flex"
+      ref={containerRef}
+      className="relative inline-flex cursor-pointer"
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
       onFocus={showTooltip}
       onBlur={hideTooltip}
+      onClick={handleClick}
     >
       {children}
       {isVisible && (

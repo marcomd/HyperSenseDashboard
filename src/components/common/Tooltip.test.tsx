@@ -176,6 +176,61 @@ describe('Tooltip', () => {
     expect(tooltip).toHaveClass('custom-class');
   });
 
+  describe('Click/Tap (Touch Support)', () => {
+    it('shows tooltip on click', () => {
+      render(
+        <Tooltip content="Test tooltip">
+          <button>Tap me</button>
+        </Tooltip>
+      );
+
+      const container = screen.getByRole('button').parentElement!;
+      fireEvent.click(container);
+
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+      expect(screen.getByText('Test tooltip')).toBeInTheDocument();
+    });
+
+    it('hides tooltip on second click (toggle)', () => {
+      render(
+        <Tooltip content="Test tooltip">
+          <button>Tap me</button>
+        </Tooltip>
+      );
+
+      const container = screen.getByRole('button').parentElement!;
+
+      // First click - show
+      fireEvent.click(container);
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+
+      // Second click - hide
+      fireEvent.click(container);
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    });
+
+    it('hides tooltip on click outside', () => {
+      render(
+        <div>
+          <Tooltip content="Test tooltip">
+            <button>Tap me</button>
+          </Tooltip>
+          <span data-testid="outside">Outside element</span>
+        </div>
+      );
+
+      const container = screen.getByRole('button').parentElement!;
+
+      // Open tooltip
+      fireEvent.click(container);
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+
+      // Click outside
+      fireEvent.mouseDown(screen.getByTestId('outside'));
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Position', () => {
     it('applies top position classes by default', async () => {
       render(

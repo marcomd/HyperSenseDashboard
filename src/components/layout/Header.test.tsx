@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@/test/test-utils'
+import { render, screen, fireEvent } from '@/test/test-utils'
 import { Header } from './Header'
 
 describe('Header', () => {
@@ -83,6 +83,43 @@ describe('Header', () => {
 
       const decisionsLink = screen.getByRole('link', { name: 'Decisions' })
       expect(decisionsLink).toHaveClass('bg-accent/20')
+    })
+  })
+
+  describe('Mobile Menu', () => {
+    it('renders hamburger menu button', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} />)
+      expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
+    })
+
+    it('toggles mobile menu when hamburger is clicked', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} />)
+
+      const menuButton = screen.getByRole('button', { name: 'Open menu' })
+      fireEvent.click(menuButton)
+
+      // Mobile menu should now be open with all nav links
+      const mobileNavLinks = screen.getAllByRole('link', { name: 'Dashboard' })
+      expect(mobileNavLinks.length).toBeGreaterThan(1) // Desktop + mobile
+
+      // Button should now say "Close menu"
+      expect(screen.getByRole('button', { name: 'Close menu' })).toBeInTheDocument()
+    })
+
+    it('closes mobile menu when a link is clicked', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} />)
+
+      // Open menu
+      const menuButton = screen.getByRole('button', { name: 'Open menu' })
+      fireEvent.click(menuButton)
+
+      // Find mobile nav links (there will be duplicates - desktop and mobile)
+      const decisionsLinks = screen.getAllByRole('link', { name: 'Decisions' })
+      // Click the mobile one (last in list)
+      fireEvent.click(decisionsLinks[decisionsLinks.length - 1])
+
+      // Menu should close, button should say "Open menu" again
+      expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
     })
   })
 })

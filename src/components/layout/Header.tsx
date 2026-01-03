@@ -1,4 +1,5 @@
-import { Activity, Wifi, WifiOff, AlertTriangle, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Activity, Wifi, WifiOff, AlertTriangle, Info, Menu, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { Tooltip } from '@/components/common/Tooltip';
@@ -25,6 +26,7 @@ const NAV_LINKS = [
 
 export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: HeaderProps) {
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Derive effective status: prefer explicit wsStatus, otherwise derive from boolean
   const effectiveStatus: WsStatus = wsStatus ?? (wsConnected ? 'connected' : 'disconnected');
@@ -115,11 +117,21 @@ export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: 
               {effectiveStatus === 'not-needed' && 'No realtime'}
             </span>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden p-2 text-slate-400 hover:text-white transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
 
-      {/* Navigation Bar */}
-      <nav className="px-6 py-2 border-t border-slate-700/30 bg-bg-secondary/50">
+      {/* Desktop Navigation Bar - hidden on mobile */}
+      <nav className="hidden md:block px-6 py-2 border-t border-slate-700/30 bg-bg-secondary/50">
         <div className="flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             const isActive = location.pathname === link.to;
@@ -140,6 +152,32 @@ export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: 
           })}
         </div>
       </nav>
+
+      {/* Mobile Navigation Dropdown */}
+      {mobileMenuOpen && (
+        <nav className="md:hidden border-t border-slate-700/30 bg-bg-secondary">
+          <div className="flex flex-col py-2">
+            {NAV_LINKS.map((link) => {
+              const isActive = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={clsx(
+                    'px-6 py-3 text-sm transition-colors',
+                    isActive
+                      ? 'bg-accent/20 text-accent font-medium'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

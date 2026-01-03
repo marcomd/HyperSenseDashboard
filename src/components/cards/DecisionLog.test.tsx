@@ -66,7 +66,7 @@ describe('DecisionLog', () => {
 
     it('displays confidence percentage', () => {
       render(<DecisionLog decisions={[createDecision({ confidence: 0.85 })]} />)
-      expect(screen.getByText('85% conf')).toBeInTheDocument()
+      expect(screen.getByText('85%')).toBeInTheDocument()
     })
 
     it('renders decision without confidence badge when null', () => {
@@ -144,40 +144,42 @@ describe('DecisionLog', () => {
   })
 
   describe('Status Display', () => {
+    // Note: Status is displayed in both mobile and desktop views, so use getAllByText
     it('displays pending status', () => {
       render(<DecisionLog decisions={[createDecision({ status: 'pending' })]} />)
-      expect(screen.getByText('pending')).toBeInTheDocument()
+      expect(screen.getAllByText('pending').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays approved status', () => {
       render(<DecisionLog decisions={[createDecision({ status: 'approved' })]} />)
-      expect(screen.getByText('approved')).toBeInTheDocument()
+      expect(screen.getAllByText('approved').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays rejected status', () => {
       render(<DecisionLog decisions={[createDecision({ status: 'rejected' })]} />)
-      expect(screen.getByText('rejected')).toBeInTheDocument()
+      expect(screen.getAllByText('rejected').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays executed status', () => {
       render(<DecisionLog decisions={[createDecision({ status: 'executed' })]} />)
-      expect(screen.getByText('executed')).toBeInTheDocument()
+      expect(screen.getAllByText('executed').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays failed status', () => {
       render(<DecisionLog decisions={[createDecision({ status: 'failed' })]} />)
-      expect(screen.getByText('failed')).toBeInTheDocument()
+      expect(screen.getAllByText('failed').length).toBeGreaterThanOrEqual(1)
     })
   })
 
   describe('Time Ago', () => {
+    // Note: Time is displayed in both mobile and desktop views, so use getAllByText
     it('displays seconds ago', () => {
       render(
         <DecisionLog
           decisions={[createDecision({ created_at: new Date('2024-01-15T11:59:30Z').toISOString() })]}
         />
       )
-      expect(screen.getByText('30s ago')).toBeInTheDocument()
+      expect(screen.getAllByText('30s ago').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays minutes ago', () => {
@@ -186,7 +188,7 @@ describe('DecisionLog', () => {
           decisions={[createDecision({ created_at: new Date('2024-01-15T11:55:00Z').toISOString() })]}
         />
       )
-      expect(screen.getByText('5m ago')).toBeInTheDocument()
+      expect(screen.getAllByText('5m ago').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays hours ago', () => {
@@ -195,7 +197,7 @@ describe('DecisionLog', () => {
           decisions={[createDecision({ created_at: new Date('2024-01-15T10:00:00Z').toISOString() })]}
         />
       )
-      expect(screen.getByText('2h ago')).toBeInTheDocument()
+      expect(screen.getAllByText('2h ago').length).toBeGreaterThanOrEqual(1)
     })
 
     it('displays days ago', () => {
@@ -204,7 +206,7 @@ describe('DecisionLog', () => {
           decisions={[createDecision({ created_at: new Date('2024-01-13T12:00:00Z').toISOString() })]}
         />
       )
-      expect(screen.getByText('2d ago')).toBeInTheDocument()
+      expect(screen.getAllByText('2d ago').length).toBeGreaterThanOrEqual(1)
     })
   })
 

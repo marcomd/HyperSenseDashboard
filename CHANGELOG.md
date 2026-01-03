@@ -5,6 +5,38 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] - 2026-01-03
+
+### Fixed
+- **Mobile Responsiveness** - Fixed two mobile device issues:
+  - Header navigation now collapses into hamburger menu on mobile (< 768px)
+  - Recent Decisions cards now use full width on mobile with inline status/time
+- **Tooltip Touch Support** - Tooltips now work on touch screens
+  - Tap to open, tap again to close (toggle behavior)
+  - Tap outside the tooltip to dismiss
+  - Hover behavior preserved for desktop users
+  - Affects Trading Status tooltip in Header and Volatility tooltip in Account Summary
+
+### Changed
+- **Header Component** - Added mobile menu toggle with hamburger/X icon
+  - Desktop navigation hidden on mobile, replaced with dropdown menu
+  - Menu closes automatically when a link is clicked
+- **DecisionLog Component** - Responsive layout improvements
+  - Status and time now inline with badges on mobile (saves horizontal space)
+  - Reduced padding and gaps on small screens
+  - LLM model badge hidden on mobile (visible on desktop)
+  - Confidence badge shortened from "85% conf" to "85%"
+
+### Technical Details
+- New state `mobileMenuOpen` in Header for menu toggle
+- Added `Menu` and `X` icons from lucide-react
+- Mobile nav uses `md:hidden`, desktop nav uses `hidden md:block`
+- DecisionItem uses responsive classes: `p-2 sm:p-3`, `gap-2 sm:gap-3`, `hidden sm:flex`
+- Added `onClick` handler to toggle tooltip visibility
+- Added click-outside listener (mousedown + touchstart) to close on tap outside
+- Added `cursor-pointer` class to indicate interactivity
+- 3 new tests for click/tap behavior
+
 ## [0.15.0] - 2026-01-02
 
 ### Added
