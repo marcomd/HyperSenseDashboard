@@ -1,5 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
+import { useEffect, useCallback, useState } from 'react';
 import { api } from '@/api/client';
 import type { HealthResponse } from '@/api/client';
 import { useDashboardChannel } from './useWebSocket';
@@ -9,6 +9,8 @@ import type {
   TradingDecision,
   MacroStrategy,
   MarketOverview,
+  RiskProfile,
+  RiskProfileName,
 } from '@/types';
 
 import type { ListFilterParams, OrderFilterParams, AccountBalanceFilterParams } from '@/types';
@@ -67,6 +69,9 @@ export const queryKeys = {
     list: (params?: AccountBalanceFilterParams) => ['accountBalances', 'list', params] as const,
     summary: ['accountBalances', 'summary'] as const,
     byId: (id: number) => ['accountBalances', id] as const,
+  },
+  riskProfile: {
+    current: ['riskProfile', 'current'] as const,
   },
 };
 
@@ -148,6 +153,20 @@ export function useDashboard() {
           };
         });
         queryClient.invalidateQueries({ queryKey: queryKeys.macroStrategy.current });
+      })
+    );
+
+    // Risk profile updates
+    unsubscribes.push(
+      on<RiskProfile>('risk_profile_update', (message) => {
+        queryClient.setQueryData<DashboardData>(queryKeys.dashboard, (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            risk_profile: message.data,
+          };
+        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.riskProfile.current });
       })
     );
 
@@ -366,4 +385,63 @@ export function useAccountBalance(id: number) {
     queryFn: () => api.accountBalances.getById(id),
     enabled: !!id,
   });
+}
+
+// Risk Profile hooks
+
+/**
+ * Hook for switching the active risk profile (cautious, moderate, fearless).
+ * Optimistically updates the UI and handles rollback on error.
+ */
+export function useSwitchRiskProfile() {
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: (profile: RiskProfileName) => api.riskProfile.switch(profile),
+    onMutate: async (newProfile) => {
+      setIsLoading(true);
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: queryKeys.dashboard });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData<DashboardData>(queryKeys.dashboard);
+
+      // Optimistically update the dashboard data
+      if (previousData) {
+        queryClient.setQueryData<DashboardData>(queryKeys.dashboard, {
+          ...previousData,
+          risk_profile: {
+            ...previousData.risk_profile,
+            name: newProfile,
+          },
+        });
+      }
+
+      return { previousData };
+    },
+    onError: (_err, _newProfile, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(queryKeys.dashboard, context.previousData);
+      }
+    },
+    onSettled: () => {
+      setIsLoading(false);
+      // Invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+    },
+  });
+
+  const switchProfile = useCallback(
+    (profile: RiskProfileName) => mutation.mutate(profile),
+    [mutation]
+  );
+
+  return {
+    switchProfile,
+    isLoading,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
 }

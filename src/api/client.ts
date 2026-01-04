@@ -23,6 +23,8 @@ import type {
   AccountBalanceDetail,
   AccountBalanceSummary,
   AccountBalanceFilterParams,
+  RiskProfileName,
+  RiskProfileParameters,
 } from '@/types';
 
 // When accessed via tunnel, use the backend tunnel URL from env
@@ -363,6 +365,25 @@ export const accountBalancesApi = {
     fetchApi<AccountBalanceSummary>('/account_balances/summary'),
 };
 
+// Risk Profile API - for switching between cautious/moderate/fearless trading styles
+export const riskProfileApi = {
+  getCurrent: () =>
+    fetchApi<{
+      profile: { name: RiskProfileName; changed_by: string; updated_at: string };
+      parameters: RiskProfileParameters;
+    }>('/risk_profile/current'),
+
+  switch: (profile: RiskProfileName) =>
+    fetchApi<{
+      profile: { name: RiskProfileName; changed_by: string; updated_at: string };
+      parameters: RiskProfileParameters;
+      message: string;
+    }>('/risk_profile/switch', {
+      method: 'PUT',
+      body: JSON.stringify({ profile }),
+    }),
+};
+
 // Export all APIs
 export const api = {
   health: healthApi,
@@ -377,6 +398,7 @@ export const api = {
   costs: costsApi,
   orders: ordersApi,
   accountBalances: accountBalancesApi,
+  riskProfile: riskProfileApi,
 };
 
 export default api;

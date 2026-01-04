@@ -37,3 +37,8 @@ export {
   createForecastListItem,
   resetForecastIdCounter,
 } from './forecast'
+
+export {
+  createRiskProfile,
+  getProfileParams,
+} from './riskProfile'

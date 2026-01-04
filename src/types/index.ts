@@ -12,6 +12,7 @@ export type AccountBalanceEventType = 'initial' | 'sync' | 'deposit' | 'withdraw
 export type RsiSignal = 'oversold' | 'overbought' | 'neutral';
 export type MacdSignal = 'bullish' | 'bearish';
 export type VolatilityLevel = 'very_high' | 'high' | 'medium' | 'low';
+export type RiskProfileName = 'cautious' | 'moderate' | 'fearless';
 
 // Volatility intervals configuration (minutes per level)
 export type VolatilityIntervals = Record<VolatilityLevel, number>;
@@ -24,6 +25,26 @@ export interface VolatilityInfo {
   next_cycle_at: string | null;
   last_decision_at: string | null;
   intervals?: VolatilityIntervals;
+}
+
+// Risk Profile Parameters (varies by profile)
+export interface RiskProfileParameters {
+  rsi_oversold: number;
+  rsi_overbought: number;
+  rsi_pullback_threshold: number;
+  rsi_bounce_threshold: number;
+  min_risk_reward_ratio: number;
+  min_confidence: number;
+  max_position_size: number;
+  default_leverage: number;
+  max_open_positions: number;
+}
+
+// Risk Profile (user-selectable trading style)
+export interface RiskProfile {
+  name: RiskProfileName;
+  parameters: RiskProfileParameters;
+  updated_at: string;
 }
 
 // Position Fees
@@ -141,6 +162,7 @@ export interface DashboardData {
   recent_decisions: TradingDecision[];
   system_status: SystemStatus;
   cost_summary: CostSummary;
+  risk_profile: RiskProfile;
 }
 
 // Hyperliquid account data from exchange API
@@ -248,7 +270,8 @@ export type WebSocketMessageType =
   | 'position_update'
   | 'decision_update'
   | 'macro_strategy_update'
-  | 'system_status_update';
+  | 'system_status_update'
+  | 'risk_profile_update';
 
 export interface WebSocketMessage<T = unknown> {
   type: WebSocketMessageType;

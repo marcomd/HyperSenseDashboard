@@ -11,6 +11,7 @@ export { DecisionLog } from './cards/DecisionLog';
 export { MarketOverview } from './cards/MarketOverview';
 export { SystemStatus } from './cards/SystemStatus';
 export { CostSummaryCard } from './cards/CostSummaryCard';
+export { RiskProfileSelector } from './cards/RiskProfileSelector';
 
 // Charts
 export { EquityCurve } from './charts/EquityCurve';

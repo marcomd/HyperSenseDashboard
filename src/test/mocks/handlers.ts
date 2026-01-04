@@ -8,7 +8,12 @@ import {
   createMarketAsset,
   createMarketSnapshot,
   createForecastListItem,
+  getProfileParams,
 } from '../factories'
+import type { RiskProfileName } from '@/types'
+
+// Mutable state for risk profile (allows tests to verify switching)
+let currentProfileName: RiskProfileName = 'moderate'
 
 export const handlers = [
   // Health endpoint
@@ -230,4 +235,44 @@ export const handlers = [
     })
   }),
 
+  // Risk Profile endpoints
+  http.get('/api/v1/risk_profile/current', () => {
+    return HttpResponse.json({
+      profile: {
+        name: currentProfileName,
+        changed_by: 'system',
+        updated_at: new Date().toISOString(),
+      },
+      parameters: getProfileParams(currentProfileName),
+    })
+  }),
+
+  http.put('/api/v1/risk_profile/switch', async ({ request }) => {
+    const body = await request.json() as { profile?: RiskProfileName }
+    const newProfile = body?.profile
+
+    if (!newProfile || !['cautious', 'moderate', 'fearless'].includes(newProfile)) {
+      return HttpResponse.json(
+        { error: `Invalid profile: ${newProfile}. Valid profiles: cautious, moderate, fearless` },
+        { status: 422 }
+      )
+    }
+
+    currentProfileName = newProfile
+    return HttpResponse.json({
+      profile: {
+        name: currentProfileName,
+        changed_by: 'dashboard',
+        updated_at: new Date().toISOString(),
+      },
+      parameters: getProfileParams(currentProfileName),
+      message: `Switched to ${currentProfileName} risk profile`,
+    })
+  }),
+
 ]
+
+// Helper to reset profile state between tests
+export function resetRiskProfileState() {
+  currentProfileName = 'moderate'
+}

@@ -7,11 +7,15 @@ import type {
   EquityPoint,
   VolatilityInfo,
   HyperliquidAccount,
+  BalanceHistory,
+  RiskProfile,
+  CostSummary,
 } from '@/types'
 import { createPosition } from './position'
 import { createDecision } from './decision'
 import { createMacroStrategy } from './macroStrategy'
 import { createMarketOverviewMap } from './marketData'
+import { createRiskProfile } from './riskProfile'
 
 interface AccountSummaryOverrides {
   open_positions_count?: number
@@ -20,6 +24,8 @@ interface AccountSummaryOverrides {
   realized_pnl_today?: number
   total_realized_pnl?: number
   all_time_pnl?: number
+  calculated_pnl?: number | null
+  balance_history?: Partial<BalanceHistory>
   paper_trading?: boolean
   circuit_breaker?: {
     daily_loss: number | null
@@ -40,6 +46,14 @@ export function createAccountSummary(
     realized_pnl_today: overrides.realized_pnl_today ?? 75.5,
     total_realized_pnl: overrides.total_realized_pnl ?? 425.0,
     all_time_pnl: overrides.all_time_pnl ?? 575.0,
+    calculated_pnl: overrides.calculated_pnl ?? 575.0,
+    balance_history: {
+      initial_balance: 1000.0,
+      total_deposits: 0,
+      total_withdrawals: 0,
+      last_sync: new Date().toISOString(),
+      ...overrides.balance_history,
+    },
     paper_trading: overrides.paper_trading ?? true,
     circuit_breaker: overrides.circuit_breaker ?? {
       daily_loss: -50,
@@ -107,6 +121,25 @@ interface DashboardDataOverrides {
   macro_strategy?: ReturnType<typeof createMacroStrategy> | null
   recent_decisions?: ReturnType<typeof createDecision>[]
   system_status?: Partial<SystemStatus>
+  cost_summary?: Partial<CostSummary>
+  risk_profile?: Partial<RiskProfile>
+}
+
+/**
+ * Creates a mock CostSummary object for testing.
+ */
+function createCostSummary(overrides: Partial<CostSummary> = {}): CostSummary {
+  return {
+    period: overrides.period ?? 'today',
+    trading_fees: overrides.trading_fees ?? 2.50,
+    llm_costs: overrides.llm_costs ?? 0.15,
+    server_cost_daily: overrides.server_cost_daily ?? 1.67,
+    total_costs: overrides.total_costs ?? 4.32,
+    gross_realized_pnl: overrides.gross_realized_pnl ?? 75.50,
+    net_realized_pnl: overrides.net_realized_pnl ?? 71.18,
+    llm_provider: overrides.llm_provider ?? 'anthropic',
+    llm_model: overrides.llm_model ?? 'claude-sonnet-4-5',
+  }
 }
 
 export function createDashboardData(
@@ -125,6 +158,8 @@ export function createDashboardData(
       createDecision({ operation: 'hold', status: 'executed', symbol: 'ETH' }),
     ],
     system_status: createSystemStatus(overrides.system_status),
+    cost_summary: createCostSummary(overrides.cost_summary),
+    risk_profile: createRiskProfile(overrides.risk_profile),
   }
 }
 

@@ -5,6 +5,34 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-01-04
+
+### Added
+- **Risk Profile Selector** - Dashboard component for switching trading profiles
+  - Three profile buttons: Cautious, Moderate, Fearless
+  - Icons: ShieldAlert, Shield, ShieldOff from lucide-react
+  - Active profile highlighted with accent color
+  - Loading state with spinner during profile switch
+  - Parameters summary showing current RSI thresholds, confidence, leverage, and max positions
+- **useSwitchRiskProfile Hook** - Mutation hook for profile switching
+  - Optimistic UI updates for instant feedback
+  - Automatic rollback on error
+  - Invalidates dashboard query on success
+- **WebSocket Handler** - Real-time profile updates via `risk_profile_update` message type
+
+### Changed
+- **Dashboard Layout** - Risk Profile Selector added to right column (above Cost Summary)
+- **useApi Types** - Added `RiskProfile` and `RiskProfileName` imports
+- **Query Keys** - Added `riskProfile.current` key for caching
+
+### Technical Details
+- New component: `src/components/cards/RiskProfileSelector.tsx`
+- New factory: `src/test/factories/riskProfile.ts`
+- Updated `src/test/factories/dashboard.ts` to include `risk_profile` and `cost_summary`
+- Updated `src/test/mocks/handlers.ts` with risk profile endpoints
+- 13 new tests for RiskProfileSelector component
+- Dashboard receives `risk_profile` from backend (name + parameters)
+
 ## [0.15.1] - 2026-01-03
 
 ### Fixed
