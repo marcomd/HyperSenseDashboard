@@ -161,6 +161,16 @@ export function AccountSummary({ account }: AccountSummaryProps) {
                 ? `${calculatedPnlProfitable ? '+' : ''}$${(account.calculated_pnl ?? 0).toFixed(2)}`
                 : `${allTimeProfitable ? '+' : ''}$${account.all_time_pnl.toFixed(2)}`}
             </div>
+            {hasBalanceHistory && account.capital_pnl_percent !== null && (
+              <div
+                className={clsx(
+                  'text-sm font-medium mt-1',
+                  calculatedPnlProfitable ? 'text-green-400' : 'text-red-400'
+                )}
+              >
+                ({calculatedPnlProfitable ? '+' : ''}{account.capital_pnl_percent.toFixed(2)}%)
+              </div>
+            )}
           </div>
 
           {/* Today's Realized PnL */}

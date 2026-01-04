@@ -25,6 +25,7 @@ interface AccountSummaryOverrides {
   total_realized_pnl?: number
   all_time_pnl?: number
   calculated_pnl?: number | null
+  capital_pnl_percent?: number | null
   balance_history?: Partial<BalanceHistory>
   paper_trading?: boolean
   circuit_breaker?: {
@@ -47,6 +48,7 @@ export function createAccountSummary(
     total_realized_pnl: overrides.total_realized_pnl ?? 425.0,
     all_time_pnl: overrides.all_time_pnl ?? 575.0,
     calculated_pnl: overrides.calculated_pnl ?? 575.0,
+    capital_pnl_percent: overrides.capital_pnl_percent ?? 57.5,
     balance_history: {
       initial_balance: 1000.0,
       total_deposits: 0,

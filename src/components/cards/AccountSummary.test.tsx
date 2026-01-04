@@ -91,17 +91,93 @@ describe('AccountSummary', () => {
     })
   })
 
+  describe('Calculated P&L', () => {
+    it('displays Calculated P&L when balance history is available', () => {
+      render(<AccountSummary account={createAccountSummary({ calculated_pnl: 575.0 })} />)
+      expect(screen.getByText('Calculated P&L')).toBeInTheDocument()
+      const pnlElement = screen.getByText('+$575.00')
+      expect(pnlElement).toBeInTheDocument()
+      expect(pnlElement).toHaveClass('text-green-400')
+    })
+
+    it('displays negative calculated PnL with red color', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            calculated_pnl: -51.93,
+            capital_pnl_percent: -5.19,
+          })}
+        />
+      )
+      const pnlElement = screen.getByText('$-51.93')
+      expect(pnlElement).toBeInTheDocument()
+      expect(pnlElement).toHaveClass('text-red-400')
+    })
+
+    it('displays capital percentage below calculated PnL', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            calculated_pnl: 150.0,
+            capital_pnl_percent: 15.0,
+          })}
+        />
+      )
+      expect(screen.getByText('(+15.00%)')).toBeInTheDocument()
+    })
+
+    it('displays negative capital percentage correctly', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            calculated_pnl: -250.0,
+            capital_pnl_percent: -25.0,
+          })}
+        />
+      )
+      expect(screen.getByText('(-25.00%)')).toBeInTheDocument()
+    })
+  })
+
   describe('All-Time P&L', () => {
-    it('displays positive all-time PnL with plus sign and green color', () => {
-      render(<AccountSummary account={createAccountSummary({ all_time_pnl: 575.0 })} />)
+    it('displays All-Time P&L when balance history not available', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            all_time_pnl: 575.0,
+            calculated_pnl: null,
+            capital_pnl_percent: null,
+            balance_history: {
+              initial_balance: null,
+              total_deposits: null,
+              total_withdrawals: null,
+              last_sync: null,
+            },
+          })}
+        />
+      )
       expect(screen.getByText('All-Time P&L')).toBeInTheDocument()
       const pnlElement = screen.getByText('+$575.00')
       expect(pnlElement).toBeInTheDocument()
       expect(pnlElement).toHaveClass('text-green-400')
     })
 
-    it('displays negative all-time PnL without plus sign and red color', () => {
-      render(<AccountSummary account={createAccountSummary({ all_time_pnl: -51.93 })} />)
+    it('displays negative all-time PnL when balance history not available', () => {
+      render(
+        <AccountSummary
+          account={createAccountSummary({
+            all_time_pnl: -51.93,
+            calculated_pnl: null,
+            capital_pnl_percent: null,
+            balance_history: {
+              initial_balance: null,
+              total_deposits: null,
+              total_withdrawals: null,
+              last_sync: null,
+            },
+          })}
+        />
+      )
       const pnlElement = screen.getByText('$-51.93')
       expect(pnlElement).toBeInTheDocument()
       expect(pnlElement).toHaveClass('text-red-400')

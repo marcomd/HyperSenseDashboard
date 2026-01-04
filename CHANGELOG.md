@@ -5,6 +5,20 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-01-04
+
+### Added
+- **Capital % ROI Display** - Account Summary now shows return on initial capital as a percentage
+  - Displays percentage below Calculated P&L value (e.g., `+$575.00` with `(+57.50%)` below)
+  - Color-coded green/red based on positive/negative returns
+  - Only shown when balance history with initial_balance is available
+
+### Changed
+- **AccountSummary Type** - Added `capital_pnl_percent: number | null` field
+- **Test Factory** - Updated `createAccountSummary` with default `capital_pnl_percent`
+
+### Supports Backend (0.36.0)
+
 ## [0.17.0] - 2026-01-04
 
 ### Added

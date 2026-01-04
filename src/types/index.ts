@@ -191,6 +191,7 @@ export interface AccountSummary {
   total_realized_pnl: number;
   all_time_pnl: number;
   calculated_pnl: number | null;
+  capital_pnl_percent: number | null;
   balance_history: BalanceHistory;
   paper_trading: boolean;
   circuit_breaker: {
