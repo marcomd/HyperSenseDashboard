@@ -95,6 +95,7 @@ export interface TradingDecision {
   volatility_level: VolatilityLevel | null;
   atr_value: number | null;
   next_cycle_interval: number | null;
+  risk_profile_name: RiskProfileName | null;
   // llm_model is only in detailed view (expand to see)
   llm_model?: string | null;
   created_at: string;

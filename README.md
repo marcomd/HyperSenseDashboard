@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.16.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.17.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ![HyperSense_dashboard_cover1.jpg](docs/HyperSense_dashboard_cover1.png)
 
@@ -55,13 +55,14 @@ src/
 │   └── client.ts                 # Typed API client for all endpoints
 ├── components/
 │   ├── cards/
-│   │   ├── AccountSummary.tsx    # Account stats (positions, PnL, margin)
-│   │   ├── CostSummaryCard.tsx   # Cost breakdown and net P&L
-│   │   ├── DecisionLog.tsx       # Recent trading decisions
-│   │   ├── MacroStrategyCard.tsx # Market bias and narrative
-│   │   ├── MarketOverview.tsx    # Asset prices and indicators
-│   │   ├── PositionsTable.tsx    # Open positions with gross/net P&L
-│   │   └── SystemStatus.tsx      # Health status indicators
+│   │   ├── AccountSummary.tsx      # Account stats (positions, PnL, margin)
+│   │   ├── CostSummaryCard.tsx     # Cost breakdown and net P&L
+│   │   ├── DecisionLog.tsx         # Recent trading decisions with profile badge
+│   │   ├── MacroStrategyCard.tsx   # Market bias and narrative
+│   │   ├── MarketOverview.tsx      # Asset prices and indicators
+│   │   ├── PositionsTable.tsx      # Open positions with gross/net P&L
+│   │   ├── RiskProfileSelector.tsx # Risk profile switcher (Cautious/Moderate/Fearless)
+│   │   └── SystemStatus.tsx        # Health status indicators
 │   ├── charts/
 │   │   └── EquityCurve.tsx       # Performance chart (Recharts)
 │   ├── common/
@@ -106,16 +107,17 @@ src/
 
 ### Dashboard Cards
 
-| Component           | Description                                                                         |
-| ------------------- | ----------------------------------------------------------------------------------- |
-| `AccountSummary`    | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
-| `CostSummaryCard`   | Net P&L, trading fees, LLM costs, server costs breakdown                            |
-| `MarketOverview`    | Current prices, RSI, MACD, EMA signals, forecasts, per-coin volatility with ATR %   |
-| `PositionsTable`    | Open positions with entry, current price, gross/net PnL, SL/TP                      |
-| `EquityCurve`       | Cumulative PnL chart with win rate statistics                                       |
-| `MacroStrategyCard` | Market bias (bullish/bearish/neutral), narrative, key levels                        |
-| `DecisionLog`       | Recent trading decisions with status, volatility, model, and reasoning              |
-| `SystemStatus`      | Health status of market data, trading cycle, macro strategy, next cycle timing      |
+| Component             | Description                                                                         |
+| --------------------- | ----------------------------------------------------------------------------------- |
+| `AccountSummary`      | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
+| `RiskProfileSelector` | Switch between Cautious/Moderate/Fearless trading profiles with parameters display  |
+| `CostSummaryCard`     | Net P&L, trading fees, LLM costs, server costs breakdown                            |
+| `MarketOverview`      | Current prices, RSI, MACD, EMA signals, forecasts, per-coin volatility with ATR %   |
+| `PositionsTable`      | Open positions with entry, current price, gross/net PnL, SL/TP                      |
+| `EquityCurve`         | Cumulative PnL chart with win rate statistics                                       |
+| `MacroStrategyCard`   | Market bias (bullish/bearish/neutral), narrative, key levels                        |
+| `DecisionLog`         | Recent trading decisions with status, volatility, profile badge, model, reasoning   |
+| `SystemStatus`        | Health status of market data, trading cycle, macro strategy, next cycle timing      |
 
 ### Layout
 
@@ -200,6 +202,40 @@ The "Trading Active/Halted" indicator reflects the **circuit breaker** state fro
   - Other risk conditions met
 
 The circuit breaker is a safety mechanism that automatically halts trading when risk thresholds are breached.
+
+### Risk Profiles
+
+The dashboard allows users to switch between three trading profiles that control the agent's risk tolerance:
+
+| Profile | Description | RSI Range | Min Confidence | Leverage | Max Positions |
+|---------|-------------|-----------|----------------|----------|---------------|
+| **Cautious** | Conservative trading with tighter thresholds | 35-65 | 70% | 2x | 3 |
+| **Moderate** | Balanced approach (default) | 30-70 | 60% | 3x | 5 |
+| **Fearless** | Aggressive trading with wider thresholds | 25-75 | 50% | 5x | 7 |
+
+**RiskProfileSelector Component:**
+
+- Located on the Dashboard (right column, above Cost Summary)
+- Three clickable profile buttons with icons (ShieldAlert, Shield, ShieldOff)
+- Active profile highlighted with accent color
+- Shows current parameters (RSI thresholds, confidence, leverage, max positions)
+- Instant switching with optimistic UI updates
+
+**Profile Badge on Decisions:**
+
+Each trading decision displays a color-coded badge showing which profile was active when the decision was made:
+
+| Profile | Badge Color |
+|---------|-------------|
+| Cautious | Blue |
+| Moderate | Slate/Gray |
+| Fearless | Orange |
+
+This audit trail helps with debugging and performance analysis across different risk settings.
+
+**Real-time Updates:**
+
+When a profile is switched (by this user or another), the dashboard receives a WebSocket `risk_profile_update` message and updates the UI immediately.
 
 ## Routing
 
@@ -343,7 +379,8 @@ src/
 │   │   ├── marketData.ts
 │   │   ├── dashboard.ts
 │   │   ├── forecast.ts
-│   │   └── marketSnapshot.ts
+│   │   ├── marketSnapshot.ts
+│   │   └── riskProfile.ts
 │   └── mocks/
 │       ├── handlers.ts   # MSW API mock handlers
 │       └── server.ts     # MSW server setup

@@ -152,6 +152,18 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
               {decision.volatility_level && (
                 <VolatilityBadge level={decision.volatility_level} size="sm" />
               )}
+              {decision.risk_profile_name && (
+                <span
+                  className={clsx(
+                    'hidden sm:inline text-xs px-2 py-0.5 rounded capitalize',
+                    decision.risk_profile_name === 'cautious' && 'text-blue-400 bg-blue-500/20',
+                    decision.risk_profile_name === 'moderate' && 'text-slate-400 bg-slate-700/50',
+                    decision.risk_profile_name === 'fearless' && 'text-orange-400 bg-orange-500/20'
+                  )}
+                >
+                  {decision.risk_profile_name}
+                </span>
+              )}
               {decision.llm_model && (
                 <span className="hidden sm:inline text-xs text-slate-500 bg-slate-800/50 px-2 py-0.5 rounded">
                   {decision.llm_model}

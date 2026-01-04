@@ -81,6 +81,17 @@ export function DecisionsPage() {
     return direction === 'long' ? 'text-green-400' : 'text-red-400'
   }
 
+  const getProfileColor = (profile: string | null) => {
+    switch (profile) {
+      case 'cautious':
+        return 'text-blue-400 bg-blue-500/20'
+      case 'fearless':
+        return 'text-orange-400 bg-orange-500/20'
+      default:
+        return 'text-slate-400 bg-slate-700/50'
+    }
+  }
+
   const columns = [
     {
       key: 'id',
@@ -133,6 +144,15 @@ export function DecisionsPage() {
       header: 'Volatility',
       render: (decision: TradingDecision) => (
         <VolatilityBadge level={decision.volatility_level} />
+      ),
+    },
+    {
+      key: 'risk_profile_name',
+      header: 'Profile',
+      render: (decision: TradingDecision) => (
+        <span className={`text-xs px-2 py-0.5 rounded capitalize ${getProfileColor(decision.risk_profile_name)}`}>
+          {decision.risk_profile_name ?? '-'}
+        </span>
       ),
     },
     {
