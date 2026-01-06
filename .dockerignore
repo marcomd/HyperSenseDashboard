@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+
+# Build output (we build inside container)
+dist
+dist-ssr
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor/IDE
+.vscode
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Testing
+coverage
+playwright-report
+test-results
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Git
+.git
+.gitignore
+
+# Documentation
+docs
+README.md
+CHANGELOG.md
+remember.txt
+
+# OS files
+.DS_Store
+Thumbs.db

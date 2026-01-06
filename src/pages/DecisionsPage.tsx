@@ -77,7 +77,8 @@ export function DecisionsPage() {
     }
   }
 
-  const getDirectionColor = (direction: string) => {
+  const getDirectionColor = (direction: string | null) => {
+    if (!direction) return 'text-slate-400'
     return direction === 'long' ? 'text-green-400' : 'text-red-400'
   }
 
@@ -127,7 +128,7 @@ export function DecisionsPage() {
       key: 'confidence',
       header: 'Confidence',
       render: (decision: TradingDecision) => (
-        <span>{(decision.confidence * 100).toFixed(0)}%</span>
+        <span>{decision.confidence !== null ? `${(decision.confidence * 100).toFixed(0)}%` : '-'}</span>
       ),
     },
     {

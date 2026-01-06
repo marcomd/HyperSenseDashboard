@@ -47,6 +47,21 @@ The dashboard will be available at http://localhost:5173
 npm run build
 ```
 
+### Docker
+
+The frontend can be run as part of the full stack using Docker Compose from the project root:
+
+```bash
+# From project root
+cp .env.docker.example .env
+# Edit .env with your configuration
+docker compose up -d --build
+```
+
+Access at http://localhost
+
+For standalone development, see the Development section above.
+
 ## Project Structure
 
 ```

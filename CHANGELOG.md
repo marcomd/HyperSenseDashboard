@@ -5,6 +5,21 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1] - 2026-01-05
+
+### Added
+- **Docker Support** - Production-ready Docker configuration for containerized deployment
+  - `Dockerfile` - Multi-stage build with nginx for serving static assets
+  - `.dockerignore` - Optimized build context for faster builds
+  - `nginx/nginx.conf` - Production nginx configuration with gzip compression and caching
+
+### Fixed
+- **Test Stability** - Fixed flaky tests in MarketOverview and DecisionsPage
+  - Updated test factories with complete mock data
+  - Fixed test setup for better isolation
+
+### Supports Backend (0.37.0)
+
 ## [0.18.0] - 2026-01-04
 
 ### Added

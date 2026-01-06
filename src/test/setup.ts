@@ -31,11 +31,11 @@ Object.defineProperty(window, 'matchMedia', {
 })
 
 // Mock ResizeObserver (needed by Recharts)
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
+globalThis.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+})) as unknown as typeof ResizeObserver
 
 // Mock ActionCable
 vi.mock('@rails/actioncable', () => ({
