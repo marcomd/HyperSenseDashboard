@@ -76,6 +76,46 @@ export interface Position {
   close_reason: string | null;
   realized_pnl: number | null;
   fees?: PositionFees;
+  // Decision context (which decisions opened/closed this position)
+  opening_decision: DecisionSummary | null;
+  closing_decision: DecisionSummary | null;
+}
+
+// Order Summary (embedded in Decision response)
+export interface OrderSummary {
+  id: number;
+  status: OrderStatus;
+  side: OrderSide;
+  size: number | null;
+  filled_size: number | null;
+  average_fill_price: number | null;
+  filled_at: string | null;
+}
+
+// Position Summary with outcome (embedded in Decision response)
+export type PositionOutcome = 'win' | 'loss' | 'breakeven';
+
+export interface PositionSummary {
+  id: number;
+  status: PositionStatus;
+  direction: Direction;
+  entry_price: number | null;
+  current_price: number | null;
+  realized_pnl: number | null;
+  unrealized_pnl: number | null;
+  pnl_percent: number | null;
+  close_reason: string | null;
+  closed_at: string | null;
+  outcome: PositionOutcome | null;
+}
+
+// Decision Summary (embedded in Position response)
+export interface DecisionSummary {
+  id: number;
+  confidence: number | null;
+  reasoning: string | null;
+  risk_profile_name: RiskProfileName | null;
+  created_at: string;
 }
 
 // Trading Decision
@@ -99,6 +139,9 @@ export interface TradingDecision {
   // llm_model is only in detailed view (expand to see)
   llm_model?: string | null;
   created_at: string;
+  // Order and position linked to this decision
+  order: OrderSummary | null;
+  position: PositionSummary | null;
 }
 
 // Macro Strategy

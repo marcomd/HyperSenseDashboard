@@ -6,9 +6,12 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from 'lucide-react';
 import clsx from 'clsx';
-import type { TradingDecision } from '@/types';
+import type { TradingDecision, PositionSummary } from '@/types';
 import { VolatilityBadge } from '@/components/common/VolatilityBadge';
 
 interface DecisionLogProps {
@@ -182,6 +185,11 @@ function DecisionItem({ decision, isExpanded, onToggleExpand }: DecisionItemProp
             </div>
           </div>
 
+          {/* Position P&L (when decision has a linked position) */}
+          {decision.position && (
+            <PositionPnLDisplay position={decision.position} />
+          )}
+
           {/* Reasoning with expand/collapse */}
           {decision.reasoning && (
             <ExpandableText
@@ -252,5 +260,98 @@ function ExpandableText({ text, isExpanded, onToggle }: ExpandableTextProps) {
         </button>
       )}
     </p>
+  );
+}
+
+interface PositionPnLDisplayProps {
+  position: PositionSummary;
+}
+
+/**
+ * Displays P&L information for a decision's linked position.
+ * Shows entry price, current/realized P&L, and win/loss outcome for closed positions.
+ */
+function PositionPnLDisplay({ position }: PositionPnLDisplayProps) {
+  const isOpen = position.status === 'open';
+  const isClosed = position.status === 'closed';
+
+  // Determine P&L value and percentage
+  const pnl = isClosed ? position.realized_pnl : position.unrealized_pnl;
+  const pnlPercent = position.pnl_percent;
+  const isPositive = pnl !== null && pnl > 0;
+  const isNegative = pnl !== null && pnl < 0;
+
+  // Format P&L with sign
+  const formatPnL = (value: number | null): string => {
+    if (value === null) return '-';
+    const sign = value >= 0 ? '+' : '';
+    return `${sign}$${value.toFixed(2)}`;
+  };
+
+  // Format percentage with sign
+  const formatPercent = (value: number | null): string => {
+    if (value === null) return '';
+    const sign = value >= 0 ? '+' : '';
+    return `(${sign}${value.toFixed(2)}%)`;
+  };
+
+  // Outcome icon for closed positions
+  const OutcomeIcon = position.outcome === 'win'
+    ? TrendingUp
+    : position.outcome === 'loss'
+    ? TrendingDown
+    : Minus;
+
+  const outcomeColor = position.outcome === 'win'
+    ? 'text-green-400'
+    : position.outcome === 'loss'
+    ? 'text-red-400'
+    : 'text-slate-400';
+
+  return (
+    <div className="flex items-center gap-2 mt-1.5 text-xs">
+      {/* Entry price */}
+      {position.entry_price && (
+        <span className="text-slate-500">
+          @ ${position.entry_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </span>
+      )}
+
+      {/* P&L value */}
+      {pnl !== null && (
+        <span
+          className={clsx(
+            'font-medium',
+            isPositive && 'text-green-400',
+            isNegative && 'text-red-400',
+            !isPositive && !isNegative && 'text-slate-400'
+          )}
+        >
+          {formatPnL(pnl)} {formatPercent(pnlPercent)}
+        </span>
+      )}
+
+      {/* Outcome badge for closed positions */}
+      {isClosed && position.outcome && (
+        <span
+          className={clsx(
+            'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-medium',
+            position.outcome === 'win' && 'bg-green-500/20 text-green-400',
+            position.outcome === 'loss' && 'bg-red-500/20 text-red-400',
+            position.outcome === 'breakeven' && 'bg-slate-700/50 text-slate-400'
+          )}
+        >
+          <OutcomeIcon className={clsx('w-3 h-3', outcomeColor)} />
+          <span className="capitalize">{position.outcome}</span>
+        </span>
+      )}
+
+      {/* Open position indicator */}
+      {isOpen && (
+        <span className="text-xs text-blue-400 bg-blue-500/20 px-1.5 py-0.5 rounded">
+          Open
+        </span>
+      )}
+    </div>
   );
 }

@@ -5,6 +5,27 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2026-01-08
+
+### Added
+- **P&L Display in Decision Log** - Trading decisions now show their position outcome
+  - Entry price display when decision has a linked position
+  - P&L value and percentage (unrealized for open, realized for closed)
+  - Win/Loss/Breakeven badge for closed positions with icons
+  - Open position indicator for active trades
+  - New `PositionPnLDisplay` component in `DecisionLog.tsx`
+
+### Changed
+- **TypeScript Types** - Extended types for decision-position linkage
+  - Added `OrderSummary` interface for order data in decision responses
+  - Added `PositionSummary` interface with `outcome` field (win/loss/breakeven)
+  - Added `DecisionSummary` interface for position responses
+  - Added `PositionOutcome` type
+  - Updated `TradingDecision` with `order` and `position` fields
+  - Updated `Position` with `opening_decision` and `closing_decision` fields
+
+### Supports Backend (0.38.0)
+
 ## [0.18.1] - 2026-01-05
 
 ### Added

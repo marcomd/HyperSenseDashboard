@@ -1,4 +1,4 @@
-import type { Position, Direction, PositionStatus } from '@/types'
+import type { Position, Direction, PositionStatus, DecisionSummary } from '@/types'
 
 let idCounter = 1
 
@@ -21,6 +21,8 @@ interface PositionOverrides {
   closed_at?: string | null
   close_reason?: string | null
   realized_pnl?: number | null
+  opening_decision?: DecisionSummary | null
+  closing_decision?: DecisionSummary | null
 }
 
 export function createPosition(overrides: PositionOverrides = {}): Position {
@@ -61,6 +63,8 @@ export function createPosition(overrides: PositionOverrides = {}): Position {
     closed_at: overrides.closed_at ?? null,
     close_reason: overrides.close_reason ?? null,
     realized_pnl: overrides.realized_pnl ?? null,
+    opening_decision: overrides.opening_decision === undefined ? null : overrides.opening_decision,
+    closing_decision: overrides.closing_decision === undefined ? null : overrides.closing_decision,
   }
 }
 

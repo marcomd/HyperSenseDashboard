@@ -5,6 +5,8 @@ import type {
   DecisionStatus,
   VolatilityLevel,
   RiskProfileName,
+  OrderSummary,
+  PositionSummary,
 } from '@/types'
 
 let idCounter = 1
@@ -28,6 +30,8 @@ interface DecisionOverrides {
   risk_profile_name?: RiskProfileName | null
   llm_model?: string | null
   created_at?: string
+  order?: OrderSummary | null
+  position?: PositionSummary | null
 }
 
 export function createDecision(overrides: DecisionOverrides = {}): TradingDecision {
@@ -56,6 +60,8 @@ export function createDecision(overrides: DecisionOverrides = {}): TradingDecisi
     risk_profile_name: overrides.risk_profile_name === undefined ? 'moderate' : overrides.risk_profile_name,
     llm_model: overrides.llm_model === undefined ? 'claude-sonnet-4-5' : overrides.llm_model,
     created_at: overrides.created_at ?? new Date().toISOString(),
+    order: overrides.order === undefined ? null : overrides.order,
+    position: overrides.position === undefined ? null : overrides.position,
   }
 }
 
