@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Activity, Wifi, WifiOff, AlertTriangle, Info, Menu, X } from 'lucide-react';
+import { Activity, Wifi, WifiOff, AlertTriangle, Info, Menu, X, Play, LogOut, Ban } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 import { Tooltip } from '@/components/common/Tooltip';
+import type { TradingModeName } from '@/types';
 
 type WsStatus = 'connected' | 'disconnected' | 'not-needed';
 
@@ -10,7 +11,11 @@ interface HeaderProps {
   wsConnected?: boolean;
   wsStatus?: WsStatus;
   paperTrading: boolean;
-  tradingAllowed: boolean;
+  /** @deprecated Use tradingMode instead. Kept for backwards compatibility. */
+  tradingAllowed?: boolean;
+  tradingMode?: TradingModeName;
+  canOpenPositions?: boolean;
+  canClosePositions?: boolean;
 }
 
 const NAV_LINKS = [
@@ -24,12 +29,54 @@ const NAV_LINKS = [
   { to: '/account-balances', label: 'Balances' },
 ];
 
-export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: HeaderProps) {
+// Mode display configuration
+const TRADING_MODE_CONFIG: Record<TradingModeName, {
+  label: string;
+  icon: typeof Play;
+  bgClass: string;
+  textClass: string;
+  dotClass: string;
+}> = {
+  enabled: {
+    label: 'Trading Active',
+    icon: Play,
+    bgClass: 'bg-green-500/20',
+    textClass: 'text-green-400',
+    dotClass: 'status-dot-success',
+  },
+  exit_only: {
+    label: 'Exit Only',
+    icon: LogOut,
+    bgClass: 'bg-yellow-500/20',
+    textClass: 'text-yellow-400',
+    dotClass: 'status-dot-warning',
+  },
+  blocked: {
+    label: 'Trading Blocked',
+    icon: Ban,
+    bgClass: 'bg-red-500/20',
+    textClass: 'text-red-400',
+    dotClass: 'status-dot-error',
+  },
+};
+
+export function Header({
+  wsConnected,
+  wsStatus,
+  paperTrading,
+  tradingMode = 'enabled',
+  canOpenPositions = true,
+  canClosePositions = true,
+}: HeaderProps) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Derive effective status: prefer explicit wsStatus, otherwise derive from boolean
   const effectiveStatus: WsStatus = wsStatus ?? (wsConnected ? 'connected' : 'disconnected');
+
+  // Get mode display config
+  const modeConfig = TRADING_MODE_CONFIG[tradingMode];
+  const ModeIcon = modeConfig.icon;
 
   return (
     <header className="bg-bg-secondary border-b border-slate-700/50">
@@ -51,43 +98,43 @@ export function Header({ wsConnected, wsStatus, paperTrading, tradingAllowed }: 
             </div>
           )}
 
-          {/* Trading Status */}
+          {/* Trading Mode Status */}
           <div className="flex items-center gap-1">
-            <div
-              className={clsx(
-                'badge',
-                tradingAllowed ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-              )}
-            >
-              <span
-                className={clsx(
-                  'status-dot mr-2',
-                  tradingAllowed ? 'status-dot-success' : 'status-dot-error'
-                )}
-              />
-              {tradingAllowed ? 'Trading Active' : 'Trading Halted'}
+            <div className={clsx('badge', modeConfig.bgClass, modeConfig.textClass)}>
+              <ModeIcon className="w-3 h-3 mr-1.5" />
+              {modeConfig.label}
             </div>
             <Tooltip
               content={
                 <div className="space-y-2">
-                  <p className="font-medium">Trading Status</p>
-                  <p className="text-slate-300 text-xs">
-                    <span className="text-green-400 font-medium">Active:</span> The agent is monitoring
-                    markets and can execute trades normally.
-                  </p>
-                  <p className="text-slate-300 text-xs">
-                    <span className="text-red-400 font-medium">Halted:</span> Circuit breaker triggered
-                    due to risk thresholds being exceeded.
-                  </p>
+                  <p className="font-medium">Trading Mode</p>
+                  <div className="space-y-1.5">
+                    <p className="text-slate-300 text-xs">
+                      <span className="text-green-400 font-medium">Enabled:</span> Normal operation.
+                      Can open and close positions.
+                    </p>
+                    <p className="text-slate-300 text-xs">
+                      <span className="text-yellow-400 font-medium">Exit Only:</span> Can only close
+                      existing positions. No new trades.
+                    </p>
+                    <p className="text-slate-300 text-xs">
+                      <span className="text-red-400 font-medium">Blocked:</span> All trading halted.
+                      No opens or closes.
+                    </p>
+                  </div>
                   <div className="border-t border-slate-600 pt-2 mt-2">
-                    <p className="text-slate-400 text-xs font-medium mb-1">Circuit breaker triggers:</p>
+                    <p className="text-slate-400 text-xs font-medium mb-1">Current Permissions:</p>
                     <ul className="text-xs text-slate-300 space-y-0.5">
-                      <li>• Daily loss exceeds 5% of account</li>
-                      <li>• 3 consecutive losing trades</li>
+                      <li className={canOpenPositions ? 'text-green-400' : 'text-red-400'}>
+                        • Open positions: {canOpenPositions ? 'Allowed' : 'Blocked'}
+                      </li>
+                      <li className={canClosePositions ? 'text-green-400' : 'text-red-400'}>
+                        • Close positions: {canClosePositions ? 'Allowed' : 'Blocked'}
+                      </li>
                     </ul>
                   </div>
                   <p className="text-slate-400 text-xs italic">
-                    Trading resumes after 24h cooldown.
+                    Change mode via Dashboard → Trading Mode card.
                   </p>
                 </div>
               }

@@ -25,6 +25,7 @@ import type {
   AccountBalanceFilterParams,
   RiskProfileName,
   RiskProfileParameters,
+  TradingModeName,
 } from '@/types';
 
 // When accessed via tunnel, use the backend tunnel URL from env
@@ -43,11 +44,14 @@ const API_BASE = getApiBase();
 export interface HealthResponse {
   status: string;
   version: string;
-  ruby_version: string;
-  rails_version: string;
+  ruby_version?: string;
+  rails_version?: string;
   environment: string;
   paper_trading: boolean;
   trading_allowed: boolean;
+  trading_mode: TradingModeName;
+  can_open_positions: boolean;
+  can_close_positions: boolean;
   timestamp: string;
 }
 
@@ -384,6 +388,27 @@ export const riskProfileApi = {
     }),
 };
 
+// Trading Mode API - for switching between enabled/exit_only/blocked trading modes
+export const tradingModeApi = {
+  getCurrent: () =>
+    fetchApi<{
+      mode: { mode: TradingModeName; reason: string | null; changed_by: string; updated_at: string };
+      can_open: boolean;
+      can_close: boolean;
+    }>('/trading_mode/current'),
+
+  switch: (mode: TradingModeName, reason?: string) =>
+    fetchApi<{
+      mode: { mode: TradingModeName; reason: string | null; changed_by: string; updated_at: string };
+      can_open: boolean;
+      can_close: boolean;
+      message: string;
+    }>('/trading_mode/switch', {
+      method: 'PUT',
+      body: JSON.stringify({ mode, reason }),
+    }),
+};
+
 // Export all APIs
 export const api = {
   health: healthApi,
@@ -399,6 +424,7 @@ export const api = {
   orders: ordersApi,
   accountBalances: accountBalancesApi,
   riskProfile: riskProfileApi,
+  tradingMode: tradingModeApi,
 };
 
 export default api;

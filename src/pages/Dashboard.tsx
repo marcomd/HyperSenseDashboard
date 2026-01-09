@@ -10,8 +10,9 @@ import {
   EquityCurve,
   CostSummaryCard,
   RiskProfileSelector,
+  TradingModeSelector,
 } from '@/components';
-import { useDashboard, usePerformance, useSwitchRiskProfile } from '@/hooks/useApi';
+import { useDashboard, usePerformance, useSwitchRiskProfile, useSwitchTradingMode } from '@/hooks/useApi';
 
 export function Dashboard() {
   const {
@@ -24,6 +25,7 @@ export function Dashboard() {
 
   const { data: performanceData, isLoading: perfLoading } = usePerformance(30);
   const { switchProfile, isLoading: profileSwitching } = useSwitchRiskProfile();
+  const { switchMode, isLoading: modeSwitching } = useSwitchTradingMode();
 
   // Derive WebSocket status for the layout
   const wsStatus = wsConnected ? 'connected' : 'disconnected';
@@ -72,6 +74,7 @@ export function Dashboard() {
     system_status,
     cost_summary,
     risk_profile,
+    trading_mode,
   } = dashboardData;
 
   return (
@@ -97,6 +100,11 @@ export function Dashboard() {
                 profile={risk_profile}
                 onSwitch={switchProfile}
                 isLoading={profileSwitching}
+              />
+              <TradingModeSelector
+                tradingMode={trading_mode}
+                onSwitch={switchMode}
+                isLoading={modeSwitching}
               />
               <CostSummaryCard costs={cost_summary} />
               <MacroStrategyCard strategy={macro_strategy} />

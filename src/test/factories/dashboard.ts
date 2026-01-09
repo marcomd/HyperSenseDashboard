@@ -10,6 +10,7 @@ import type {
   BalanceHistory,
   RiskProfile,
   CostSummary,
+  TradingMode,
 } from '@/types'
 import { createPosition } from './position'
 import { createDecision } from './decision'
@@ -125,6 +126,7 @@ interface DashboardDataOverrides {
   system_status?: Partial<SystemStatus>
   cost_summary?: Partial<CostSummary>
   risk_profile?: Partial<RiskProfile>
+  trading_mode?: Partial<TradingMode>
 }
 
 /**
@@ -141,6 +143,20 @@ function createCostSummary(overrides: Partial<CostSummary> = {}): CostSummary {
     net_realized_pnl: overrides.net_realized_pnl ?? 71.18,
     llm_provider: overrides.llm_provider ?? 'anthropic',
     llm_model: overrides.llm_model ?? 'claude-sonnet-4-5',
+  }
+}
+
+/**
+ * Creates a mock TradingMode object for testing.
+ */
+export function createTradingMode(overrides: Partial<TradingMode> = {}): TradingMode {
+  return {
+    mode: overrides.mode ?? 'enabled',
+    reason: overrides.reason ?? null,
+    changed_by: overrides.changed_by ?? 'system',
+    can_open: overrides.can_open ?? true,
+    can_close: overrides.can_close ?? true,
+    updated_at: overrides.updated_at ?? new Date().toISOString(),
   }
 }
 
@@ -162,6 +178,7 @@ export function createDashboardData(
     system_status: createSystemStatus(overrides.system_status),
     cost_summary: createCostSummary(overrides.cost_summary),
     risk_profile: createRiskProfile(overrides.risk_profile),
+    trading_mode: createTradingMode(overrides.trading_mode),
   }
 }
 

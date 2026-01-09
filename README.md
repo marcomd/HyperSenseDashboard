@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.19.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.20.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ![HyperSense_dashboard_cover1.jpg](docs/HyperSense_dashboard_cover1.png)
 
@@ -77,6 +77,7 @@ src/
 │   │   ├── MarketOverview.tsx      # Asset prices and indicators
 │   │   ├── PositionsTable.tsx      # Open positions with gross/net P&L
 │   │   ├── RiskProfileSelector.tsx # Risk profile switcher (Cautious/Moderate/Fearless)
+│   │   ├── TradingModeSelector.tsx # Trading mode control (Enabled/Exit Only/Blocked)
 │   │   └── SystemStatus.tsx        # Health status indicators
 │   ├── charts/
 │   │   └── EquityCurve.tsx       # Performance chart (Recharts)
@@ -122,11 +123,12 @@ src/
 
 ### Dashboard Cards
 
-| Component             | Description                                                                         |
-| --------------------- | ----------------------------------------------------------------------------------- |
-| `AccountSummary`      | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
-| `RiskProfileSelector` | Switch between Cautious/Moderate/Fearless trading profiles with parameters display  |
-| `CostSummaryCard`     | Net P&L, trading fees, LLM costs, server costs breakdown                            |
+| Component              | Description                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------- |
+| `AccountSummary`       | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
+| `RiskProfileSelector`  | Switch between Cautious/Moderate/Fearless trading profiles with parameters display  |
+| `TradingModeSelector`  | Control trading mode (Enabled/Exit Only/Blocked) with circuit breaker integration   |
+| `CostSummaryCard`      | Net P&L, trading fees, LLM costs, server costs breakdown                            |
 | `MarketOverview`      | Current prices, RSI, MACD, EMA signals, forecasts, per-coin volatility with ATR %   |
 | `PositionsTable`      | Open positions with entry, current price, gross/net PnL, SL/TP                      |
 | `EquityCurve`         | Cumulative PnL chart with win rate statistics                                       |
@@ -194,11 +196,11 @@ Detail pages display historical, paginated data fetched via REST API. They inclu
 
 The header displays three status indicators:
 
-| Indicator             | States                                                    | Description                                                            |
-| --------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Paper Trading**     | Yellow badge (shown/hidden)                               | Indicates sandbox mode based on `paper_trading` setting from backend   |
-| **Trading Status**    | Green "Trading Active" / Red "Trading Halted"             | Reflects circuit breaker state - whether the system can execute trades |
-| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "Polling" | WebSocket connection state (Dashboard) or polling mode (detail pages)  |
+| Indicator             | States                                                                    | Description                                                          |
+| --------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Paper Trading**     | Yellow badge (shown/hidden)                                               | Indicates sandbox mode based on `paper_trading` setting from backend |
+| **Trading Mode**      | Green "Trading Active" / Yellow "Exit Only" / Red "Trading Blocked"       | Current trading mode - controls what operations are allowed          |
+| **Connection Status** | Green "Connected" / Red "Disconnected" / Orange "Polling"                 | WebSocket connection state (Dashboard) or polling mode (detail pages)|
 
 #### Connection Status Explained
 
@@ -206,17 +208,17 @@ The header displays three status indicators:
 - **Disconnected** (red): WebSocket connection failed or dropped (Dashboard only)
 - **Polling** (gray): Page uses REST API polling instead of WebSocket (detail pages)
 
-#### Trading Status Explained
+#### Trading Mode Explained
 
-The "Trading Active/Halted" indicator reflects the **circuit breaker** state from the backend:
+The trading mode indicator shows the current operational state of the trading engine:
 
-- **Trading Active** (green): The trading engine is allowed to execute trades
-- **Trading Halted** (red): The circuit breaker has stopped trading due to:
-  - Maximum drawdown exceeded
-  - Position limits violated
-  - Other risk conditions met
+| Mode | Badge Color | Can Open | Can Close | Description |
+|------|-------------|----------|-----------|-------------|
+| **Trading Active** | Green | Yes | Yes | Normal operation |
+| **Exit Only** | Yellow | No | Yes | Wind-down mode - set automatically by circuit breaker |
+| **Trading Blocked** | Red | No | No | Complete halt - no trading allowed |
 
-The circuit breaker is a safety mechanism that automatically halts trading when risk thresholds are breached.
+The circuit breaker automatically sets the mode to "Exit Only" when risk thresholds are breached (daily loss > 5% or 3 consecutive losses). Users can override this via the TradingModeSelector on the Dashboard.
 
 ### Risk Profiles
 

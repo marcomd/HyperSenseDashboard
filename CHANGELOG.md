@@ -5,6 +5,45 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2026-01-08
+
+### Added
+- **Trading Mode Selector** - New dashboard card for controlling trading modes
+  - Three buttons: Enabled (green), Exit Only (yellow), Blocked (red)
+  - Shows circuit breaker warning when mode was set automatically
+  - Displays current permissions (can open/close positions)
+  - Info banner explaining user can override circuit breaker
+
+- **Trading Mode Types** - TypeScript types for trading mode
+  - `TradingModeName` type: `'enabled' | 'exit_only' | 'blocked'`
+  - `TradingMode` interface with mode, reason, changed_by, permissions
+
+- **useSwitchTradingMode Hook** - React Query mutation hook
+  - Optimistic updates for immediate UI feedback
+  - Automatic rollback on error
+  - Query invalidation for dashboard and health data
+
+- **WebSocket Integration** - Real-time trading mode updates
+  - `trading_mode_update` message handler in `useDashboard`
+  - Automatic UI updates when mode changes (from dashboard or circuit breaker)
+
+### Changed
+- **Header** - Enhanced trading status display
+  - Shows trading mode with color-coded badge (Enabled/Exit Only/Blocked)
+  - Tooltip now explains all three modes and current permissions
+  - Mode-specific icons (Play, LogOut, Ban)
+
+- **TradingStatusContext** - Added trading mode fields
+  - `tradingMode`, `canOpenPositions`, `canClosePositions` from health endpoint
+  - Values passed to Header via AppLayout
+
+- **Dashboard** - Added TradingModeSelector card in right column
+
+- **API Client** - Added trading mode endpoints
+  - `tradingModeApi.getCurrent()`, `tradingModeApi.switch(mode, reason?)`
+
+### Supports Backend (0.39.0)
+
 ## [0.19.0] - 2026-01-08
 
 ### Added

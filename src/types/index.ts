@@ -13,6 +13,7 @@ export type RsiSignal = 'oversold' | 'overbought' | 'neutral';
 export type MacdSignal = 'bullish' | 'bearish';
 export type VolatilityLevel = 'very_high' | 'high' | 'medium' | 'low';
 export type RiskProfileName = 'cautious' | 'moderate' | 'fearless';
+export type TradingModeName = 'enabled' | 'exit_only' | 'blocked';
 
 // Volatility intervals configuration (minutes per level)
 export type VolatilityIntervals = Record<VolatilityLevel, number>;
@@ -44,6 +45,16 @@ export interface RiskProfileParameters {
 export interface RiskProfile {
   name: RiskProfileName;
   parameters: RiskProfileParameters;
+  updated_at: string;
+}
+
+// Trading Mode (user-controlled trading permissions)
+export interface TradingMode {
+  mode: TradingModeName;
+  reason: string | null;
+  changed_by: string;
+  can_open: boolean;
+  can_close: boolean;
   updated_at: string;
 }
 
@@ -207,6 +218,7 @@ export interface DashboardData {
   system_status: SystemStatus;
   cost_summary: CostSummary;
   risk_profile: RiskProfile;
+  trading_mode: TradingMode;
 }
 
 // Hyperliquid account data from exchange API
@@ -316,7 +328,8 @@ export type WebSocketMessageType =
   | 'decision_update'
   | 'macro_strategy_update'
   | 'system_status_update'
-  | 'risk_profile_update';
+  | 'risk_profile_update'
+  | 'trading_mode_update';
 
 export interface WebSocketMessage<T = unknown> {
   type: WebSocketMessageType;

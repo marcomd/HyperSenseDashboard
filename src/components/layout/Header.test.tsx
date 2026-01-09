@@ -21,15 +21,20 @@ describe('Header', () => {
     })
   })
 
-  describe('Trading Status', () => {
-    it('shows Trading Active when tradingAllowed is true', () => {
-      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} />)
+  describe('Trading Mode Status', () => {
+    it('shows Trading Active when tradingMode is enabled', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} tradingMode="enabled" />)
       expect(screen.getByText('Trading Active')).toBeInTheDocument()
     })
 
-    it('shows Trading Halted when tradingAllowed is false', () => {
-      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={false} />)
-      expect(screen.getByText('Trading Halted')).toBeInTheDocument()
+    it('shows Exit Only when tradingMode is exit_only', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={true} tradingMode="exit_only" />)
+      expect(screen.getByText('Exit Only')).toBeInTheDocument()
+    })
+
+    it('shows Trading Blocked when tradingMode is blocked', () => {
+      render(<Header wsConnected={true} paperTrading={false} tradingAllowed={false} tradingMode="blocked" />)
+      expect(screen.getByText('Trading Blocked')).toBeInTheDocument()
     })
   })
 

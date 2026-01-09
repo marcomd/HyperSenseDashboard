@@ -12,6 +12,7 @@ export { MarketOverview } from './cards/MarketOverview';
 export { SystemStatus } from './cards/SystemStatus';
 export { CostSummaryCard } from './cards/CostSummaryCard';
 export { RiskProfileSelector } from './cards/RiskProfileSelector';
+export { TradingModeSelector } from './cards/TradingModeSelector';
 
 // Charts
 export { EquityCurve } from './charts/EquityCurve';

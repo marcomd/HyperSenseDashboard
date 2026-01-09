@@ -4,16 +4,23 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/api/client';
 import type { HealthResponse } from '@/api/client';
 import { queryKeys } from '@/hooks/useApi';
+import type { TradingModeName } from '@/types';
 
 /**
  * Trading status shared across all pages.
- * Provides paper_trading, circuit breaker status, and version info.
+ * Provides paper_trading, trading mode status, and version info.
  */
 interface TradingStatus {
   /** Whether paper trading mode is enabled */
   paperTrading: boolean;
-  /** Whether trading is allowed (circuit breaker not triggered) */
+  /** Whether any trading is allowed (can open or close positions) */
   tradingAllowed: boolean;
+  /** Current trading mode: enabled, exit_only, or blocked */
+  tradingMode: TradingModeName;
+  /** Whether new positions can be opened */
+  canOpenPositions: boolean;
+  /** Whether positions can be closed */
+  canClosePositions: boolean;
   /** Backend version string */
   backendVersion: string;
   /** Frontend version string */
@@ -49,6 +56,9 @@ export function TradingStatusProvider({ children }: TradingStatusProviderProps) 
   const value = useMemo<TradingStatus>(() => ({
     paperTrading: healthData?.paper_trading ?? false,
     tradingAllowed: healthData?.trading_allowed ?? true,
+    tradingMode: healthData?.trading_mode ?? 'enabled',
+    canOpenPositions: healthData?.can_open_positions ?? true,
+    canClosePositions: healthData?.can_close_positions ?? true,
     backendVersion: healthData?.version ?? '...',
     frontendVersion: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '...',
     environment: healthData?.environment ?? 'unknown',

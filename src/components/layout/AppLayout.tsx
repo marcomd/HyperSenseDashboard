@@ -19,7 +19,7 @@ interface AppLayoutProps {
  * Must be used within a TradingStatusProvider (set up in App.tsx).
  */
 export function AppLayout({ children, wsStatus = 'not-needed', onRefresh }: AppLayoutProps) {
-  const { paperTrading, tradingAllowed } = useTradingStatus();
+  const { paperTrading, tradingAllowed, tradingMode, canOpenPositions, canClosePositions } = useTradingStatus();
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col">
@@ -27,6 +27,9 @@ export function AppLayout({ children, wsStatus = 'not-needed', onRefresh }: AppL
         wsStatus={wsStatus}
         paperTrading={paperTrading}
         tradingAllowed={tradingAllowed}
+        tradingMode={tradingMode}
+        canOpenPositions={canOpenPositions}
+        canClosePositions={canClosePositions}
       />
       <main className="flex-1">
         {children}

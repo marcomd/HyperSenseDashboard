@@ -202,9 +202,12 @@ describe('AccountSummary', () => {
 
   describe('Circuit Breaker', () => {
     it('shows Circuit Breaker Active badge when trading not allowed', () => {
-      // Mock context to return tradingAllowed: false
+      // Mock context to return tradingAllowed: false (exit_only mode)
       vi.spyOn(TradingStatusContext, 'useTradingStatus').mockReturnValue({
         tradingAllowed: false,
+        tradingMode: 'exit_only',
+        canOpenPositions: false,
+        canClosePositions: true,
         paperTrading: false,
         backendVersion: '0.27.0',
         frontendVersion: '0.10.0',

@@ -11,6 +11,8 @@ import type {
   MarketOverview,
   RiskProfile,
   RiskProfileName,
+  TradingMode,
+  TradingModeName,
 } from '@/types';
 
 import type { ListFilterParams, OrderFilterParams, AccountBalanceFilterParams } from '@/types';
@@ -72,6 +74,9 @@ export const queryKeys = {
   },
   riskProfile: {
     current: ['riskProfile', 'current'] as const,
+  },
+  tradingMode: {
+    current: ['tradingMode', 'current'] as const,
   },
 };
 
@@ -167,6 +172,22 @@ export function useDashboard() {
           };
         });
         queryClient.invalidateQueries({ queryKey: queryKeys.riskProfile.current });
+      })
+    );
+
+    // Trading mode updates
+    unsubscribes.push(
+      on<TradingMode>('trading_mode_update', (message) => {
+        queryClient.setQueryData<DashboardData>(queryKeys.dashboard, (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            trading_mode: message.data,
+          };
+        });
+        queryClient.invalidateQueries({ queryKey: queryKeys.tradingMode.current });
+        // Also update health data since trading mode affects trading_allowed
+        queryClient.invalidateQueries({ queryKey: queryKeys.health });
       })
     );
 
@@ -440,6 +461,69 @@ export function useSwitchRiskProfile() {
 
   return {
     switchProfile,
+    isLoading,
+    isError: mutation.isError,
+    error: mutation.error,
+  };
+}
+
+// Trading Mode hooks
+
+/**
+ * Hook for switching the active trading mode (enabled, exit_only, blocked).
+ * Optimistically updates the UI and handles rollback on error.
+ */
+export function useSwitchTradingMode() {
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mutation = useMutation({
+    mutationFn: ({ mode, reason }: { mode: TradingModeName; reason?: string }) =>
+      api.tradingMode.switch(mode, reason),
+    onMutate: async ({ mode }) => {
+      setIsLoading(true);
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: queryKeys.dashboard });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData<DashboardData>(queryKeys.dashboard);
+
+      // Optimistically update the dashboard data
+      if (previousData) {
+        queryClient.setQueryData<DashboardData>(queryKeys.dashboard, {
+          ...previousData,
+          trading_mode: {
+            ...previousData.trading_mode,
+            mode,
+            can_open: mode === 'enabled',
+            can_close: mode !== 'blocked',
+          },
+        });
+      }
+
+      return { previousData };
+    },
+    onError: (_err, _vars, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        queryClient.setQueryData(queryKeys.dashboard, context.previousData);
+      }
+    },
+    onSettled: () => {
+      setIsLoading(false);
+      // Invalidate to ensure we have the latest data
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.health });
+    },
+  });
+
+  const switchMode = useCallback(
+    (mode: TradingModeName, reason?: string) => mutation.mutate({ mode, reason }),
+    [mutation]
+  );
+
+  return {
+    switchMode,
     isLoading,
     isError: mutation.isError,
     error: mutation.error,
