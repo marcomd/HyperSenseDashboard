@@ -7,6 +7,7 @@ import {
   SearchFilter,
   Pagination,
 } from '@/components/filters'
+import { PositionPnLDisplay } from '@/components/cards/DecisionLog'
 import { useDecisionsList } from '@/hooks/useApi'
 import type { TradingDecision } from '@/types'
 
@@ -171,6 +172,12 @@ export function DecisionsPage() {
         <h4 className="text-sm font-medium text-slate-400 mb-1">Reasoning</h4>
         <p className="text-sm text-slate-300">{decision.reasoning}</p>
       </div>
+      {decision.position && (
+        <div>
+          <h4 className="text-sm font-medium text-slate-400 mb-1">Position</h4>
+          <PositionPnLDisplay position={decision.position} />
+        </div>
+      )}
       {decision.llm_model && (
         <div>
           <h4 className="text-sm font-medium text-slate-400 mb-1">Model</h4>

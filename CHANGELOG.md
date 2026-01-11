@@ -5,6 +5,20 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2026-01-11
+
+### Added
+- **Position P&L in Decisions Page** - Trading Decisions page now shows position P&L in expanded row
+  - Displays entry price, P&L value and percentage
+  - Win/Loss/Breakeven outcome badge for closed positions
+  - "Open" indicator for open positions
+  - Reuses `PositionPnLDisplay` component from DecisionLog
+
+### Changed
+- **DecisionLog Component** - Exported `PositionPnLDisplay` component for reuse
+
+### Supports Backend (0.39.1)
+
 ## [0.20.0] - 2026-01-08
 
 ### Added

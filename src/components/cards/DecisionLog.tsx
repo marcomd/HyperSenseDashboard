@@ -263,7 +263,7 @@ function ExpandableText({ text, isExpanded, onToggle }: ExpandableTextProps) {
   );
 }
 
-interface PositionPnLDisplayProps {
+export interface PositionPnLDisplayProps {
   position: PositionSummary;
 }
 
@@ -271,7 +271,7 @@ interface PositionPnLDisplayProps {
  * Displays P&L information for a decision's linked position.
  * Shows entry price, current/realized P&L, and win/loss outcome for closed positions.
  */
-function PositionPnLDisplay({ position }: PositionPnLDisplayProps) {
+export function PositionPnLDisplay({ position }: PositionPnLDisplayProps) {
   const isOpen = position.status === 'open';
   const isClosed = position.status === 'closed';
 
