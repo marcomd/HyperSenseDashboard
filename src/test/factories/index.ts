@@ -26,6 +26,8 @@ export {
   createPerformanceStats,
   createPerformanceData,
   createEmptyPerformanceData,
+  createNegativePerformanceData,
+  createMixedPerformanceData,
   createTradingMode,
 } from './dashboard'
 

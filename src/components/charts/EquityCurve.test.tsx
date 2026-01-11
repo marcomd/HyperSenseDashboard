@@ -1,7 +1,13 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@/test/test-utils'
 import { EquityCurve } from './EquityCurve'
-import { createPerformanceData, createEmptyPerformanceData } from '@/test/factories'
+import { calculateGradientOffset } from '@/utils/chart'
+import {
+  createPerformanceData,
+  createEmptyPerformanceData,
+  createMixedPerformanceData,
+  createNegativePerformanceData,
+} from '@/test/factories'
 
 // Mock Recharts components since they don't render properly in jsdom
 vi.mock('recharts', () => ({
@@ -16,6 +22,7 @@ vi.mock('recharts', () => ({
   YAxis: () => <div data-testid="y-axis" />,
   CartesianGrid: () => <div data-testid="cartesian-grid" />,
   Tooltip: () => <div data-testid="tooltip" />,
+  ReferenceLine: () => <div data-testid="reference-line" />,
 }))
 
 describe('EquityCurve', () => {
@@ -131,5 +138,80 @@ describe('EquityCurve', () => {
       expect(screen.getByTestId('responsive-container')).toBeInTheDocument()
       expect(screen.getByTestId('area-chart')).toBeInTheDocument()
     })
+
+    it('renders reference line at zero', () => {
+      render(<EquityCurve data={createPerformanceData()} />)
+      expect(screen.getByTestId('reference-line')).toBeInTheDocument()
+    })
+
+    it('renders chart with mixed positive/negative data', () => {
+      render(<EquityCurve data={createMixedPerformanceData()} />)
+      expect(screen.getByTestId('area-chart')).toBeInTheDocument()
+    })
+
+    it('renders chart with all negative data', () => {
+      render(<EquityCurve data={createNegativePerformanceData()} />)
+      expect(screen.getByTestId('area-chart')).toBeInTheDocument()
+    })
+  })
+})
+
+describe('calculateGradientOffset', () => {
+  it('returns 0.5 for empty data', () => {
+    expect(calculateGradientOffset([])).toBe(0.5)
+  })
+
+  it('returns near 0 when all values are negative', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: -10, cumulative_pnl: -10 },
+      { date: '2024-01-02', daily_pnl: -5, cumulative_pnl: -15 },
+    ]
+    expect(calculateGradientOffset(data)).toBe(0.001)
+  })
+
+  it('returns near 1 when all values are positive', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: 10, cumulative_pnl: 10 },
+      { date: '2024-01-02', daily_pnl: 5, cumulative_pnl: 15 },
+    ]
+    expect(calculateGradientOffset(data)).toBe(0.999)
+  })
+
+  it('calculates correct offset when zero is in the middle', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: -20, cumulative_pnl: -20 },
+      { date: '2024-01-02', daily_pnl: 40, cumulative_pnl: 20 },
+    ]
+    // max = 20, min = -20, range = 40
+    // offset = 20 / 40 = 0.5
+    expect(calculateGradientOffset(data)).toBe(0.5)
+  })
+
+  it('calculates correct offset for asymmetric ranges', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: 100, cumulative_pnl: 100 },
+      { date: '2024-01-02', daily_pnl: -150, cumulative_pnl: -50 },
+    ]
+    // max = 100, min = -50, range = 150
+    // offset = 100 / 150 = 0.6667
+    expect(calculateGradientOffset(data)).toBeCloseTo(0.6667, 3)
+  })
+
+  it('handles data where max equals zero', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: -10, cumulative_pnl: -10 },
+      { date: '2024-01-02', daily_pnl: 10, cumulative_pnl: 0 },
+    ]
+    // max = 0, all values negative or zero
+    expect(calculateGradientOffset(data)).toBe(0.001)
+  })
+
+  it('handles data where min equals zero', () => {
+    const data = [
+      { date: '2024-01-01', daily_pnl: 10, cumulative_pnl: 10 },
+      { date: '2024-01-02', daily_pnl: -10, cumulative_pnl: 0 },
+    ]
+    // min = 0, all values positive or zero
+    expect(calculateGradientOffset(data)).toBe(0.999)
   })
 })

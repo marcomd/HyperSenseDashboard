@@ -5,6 +5,44 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.0] - 2026-01-11
+
+### Changed
+- **Segmented Performance Chart** - EquityCurve now displays green/red segments based on PnL
+  - Green gradient for values above zero (profit regions)
+  - Red gradient for values below zero (loss regions)
+  - Dashed reference line at zero for visual clarity
+  - Dynamic gradient offset calculation based on data range
+  - Better visual distinction between profitable and losing periods
+
+### Technical Details
+- New `calculateGradientOffset()` utility function exported for testing
+- Uses SVG LinearGradient with dynamic stop positions
+- Added `ReferenceLine` component at y=0
+- New test factories: `createMixedPerformanceData()`, `createNegativePerformanceData()`
+- 7 new tests for gradient offset calculation edge cases
+
+## [0.23.0] - 2026-01-11
+
+### Added
+- **Performance Percentage** - EquityCurve now displays percentage of initial capital alongside dollar P&L
+  - Shows format like "$-2.01 (-1.23%)" for clearer context
+  - Percentage passed from AccountSummary's `capital_pnl_percent`
+
+- **Trading Mode Help Tooltip** - Info icon next to "Trading Mode" title
+  - Explains Enabled, Exit Only, and Blocked modes
+  - Notes circuit breaker automatic triggering
+
+- **Risk Profile Help Tooltip** - Info icon next to "Risk Profile" title
+  - Explains Cautious, Moderate, and Fearless profiles
+  - Clarifies that changes affect future decisions only, not open positions
+
+### Changed
+- **Market Overview Layout** - Cards now fill available space dynamically
+  - Uses CSS Grid `auto-fit` with `minmax(280px, 1fr)`
+  - Eliminates empty space when fewer assets are tracked
+  - Cards expand to fill container (2 coins = 50% each)
+
 ## [0.22.0] - 2026-01-11
 
 ### Added

@@ -6,17 +6,21 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import { TrendingUp, TrendingDown, Award, Target } from 'lucide-react';
 import clsx from 'clsx';
 import type { PerformanceData } from '@/types';
+import { calculateGradientOffset } from '@/utils/chart';
 
 interface EquityCurveProps {
   data: PerformanceData | undefined;
   isLoading?: boolean;
+  /** Percentage of initial capital for displaying ROI context */
+  capitalPnlPercent?: number | null;
 }
 
-export function EquityCurve({ data, isLoading }: EquityCurveProps) {
+export function EquityCurve({ data, isLoading, capitalPnlPercent }: EquityCurveProps) {
   if (isLoading) {
     return (
       <div className="card">
@@ -49,6 +53,7 @@ export function EquityCurve({ data, isLoading }: EquityCurveProps) {
 
   const { equity_curve, statistics } = data;
   const isProfitable = statistics.total_pnl >= 0;
+  const gradientOffset = calculateGradientOffset(equity_curve);
 
   return (
     <div className="card">
@@ -61,6 +66,11 @@ export function EquityCurve({ data, isLoading }: EquityCurveProps) {
           )}
         >
           {isProfitable ? '+' : ''}${statistics.total_pnl.toFixed(2)}
+          {capitalPnlPercent != null && (
+            <span className="ml-1.5 text-sm font-medium">
+              ({capitalPnlPercent >= 0 ? '+' : ''}{capitalPnlPercent.toFixed(2)}%)
+            </span>
+          )}
         </div>
       </div>
       <div className="card-body">
@@ -100,17 +110,35 @@ export function EquityCurve({ data, isLoading }: EquityCurveProps) {
               margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
             >
               <defs>
-                <linearGradient id="colorPnl" x1="0" y1="0" x2="0" y2="1">
+                {/* Fill gradient - green above zero, red below */}
+                <linearGradient id="colorPnlFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.3} />
                   <stop
-                    offset="5%"
-                    stopColor={isProfitable ? '#22c55e' : '#ef4444'}
-                    stopOpacity={0.3}
+                    offset={`${gradientOffset * 100}%`}
+                    stopColor="#22c55e"
+                    stopOpacity={0.05}
                   />
                   <stop
-                    offset="95%"
-                    stopColor={isProfitable ? '#22c55e' : '#ef4444'}
-                    stopOpacity={0}
+                    offset={`${gradientOffset * 100}%`}
+                    stopColor="#ef4444"
+                    stopOpacity={0.05}
                   />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.3} />
+                </linearGradient>
+                {/* Stroke gradient for the line */}
+                <linearGradient id="colorPnlStroke" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#22c55e" stopOpacity={1} />
+                  <stop
+                    offset={`${gradientOffset * 100}%`}
+                    stopColor="#22c55e"
+                    stopOpacity={1}
+                  />
+                  <stop
+                    offset={`${gradientOffset * 100}%`}
+                    stopColor="#ef4444"
+                    stopOpacity={1}
+                  />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={1} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -144,13 +172,20 @@ export function EquityCurve({ data, isLoading }: EquityCurveProps) {
                   return date.toLocaleDateString();
                 }}
               />
+              <ReferenceLine
+                y={0}
+                stroke="#64748b"
+                strokeDasharray="3 3"
+                strokeOpacity={0.5}
+              />
               <Area
                 type="monotone"
                 dataKey="cumulative_pnl"
-                stroke={isProfitable ? '#22c55e' : '#ef4444'}
+                stroke="url(#colorPnlStroke)"
                 fillOpacity={1}
-                fill="url(#colorPnl)"
+                fill="url(#colorPnlFill)"
                 strokeWidth={2}
+                baseValue={0}
               />
             </AreaChart>
           </ResponsiveContainer>

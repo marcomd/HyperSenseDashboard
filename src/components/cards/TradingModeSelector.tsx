@@ -1,6 +1,7 @@
 import { Play, LogOut, Ban, Loader2, AlertTriangle, Info } from 'lucide-react';
 import clsx from 'clsx';
 import type { TradingMode, TradingModeName } from '@/types';
+import { Tooltip } from '@/components/common/Tooltip';
 
 interface TradingModeSelectorProps {
   tradingMode: TradingMode;
@@ -58,7 +59,36 @@ export function TradingModeSelector({
   return (
     <div className="card">
       <div className="card-header">
-        <h2 className="text-lg font-semibold text-white">Trading Mode</h2>
+        <div className="flex items-center gap-1.5">
+          <h2 className="text-lg font-semibold text-white">Trading Mode</h2>
+          <Tooltip
+            content={
+              <div className="space-y-2">
+                <p className="font-medium">Trading Mode Control</p>
+                <div className="space-y-1.5">
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-green-400 font-medium">Enabled:</span> Normal operation.
+                    Can open and close positions.
+                  </p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-yellow-400 font-medium">Exit Only:</span> Can only close
+                    existing positions. No new trades.
+                  </p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-red-400 font-medium">Blocked:</span> All trading halted.
+                    No opens or closes.
+                  </p>
+                </div>
+                <p className="text-slate-400 text-xs italic border-t border-slate-600 pt-2 mt-2">
+                  The circuit breaker may automatically set Exit Only mode when risk thresholds are exceeded.
+                </p>
+              </div>
+            }
+            position="bottom"
+          >
+            <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help" />
+          </Tooltip>
+        </div>
       </div>
       <div className="card-body space-y-4">
         {/* Circuit breaker warning banner */}

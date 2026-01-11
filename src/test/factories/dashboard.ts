@@ -252,3 +252,53 @@ export function createEmptyPerformanceData(): PerformanceData {
     }),
   }
 }
+
+/**
+ * Creates performance data with all negative cumulative PnL values.
+ * Useful for testing the red gradient display.
+ */
+export function createNegativePerformanceData(): PerformanceData {
+  return {
+    equity_curve: [
+      { date: '2024-01-01T00:00:00Z', daily_pnl: -50, cumulative_pnl: -50 },
+      { date: '2024-01-02T00:00:00Z', daily_pnl: -30, cumulative_pnl: -80 },
+      { date: '2024-01-03T00:00:00Z', daily_pnl: 20, cumulative_pnl: -60 },
+      { date: '2024-01-04T00:00:00Z', daily_pnl: -20, cumulative_pnl: -80 },
+      { date: '2024-01-05T00:00:00Z', daily_pnl: -10, cumulative_pnl: -90 },
+    ],
+    statistics: createPerformanceStats({
+      total_trades: 5,
+      wins: 1,
+      losses: 4,
+      win_rate: 20,
+      total_pnl: -90,
+      avg_win: 20,
+      avg_loss: -27.5,
+    }),
+  }
+}
+
+/**
+ * Creates performance data that crosses zero multiple times.
+ * Useful for testing the dual-color gradient display.
+ */
+export function createMixedPerformanceData(): PerformanceData {
+  return {
+    equity_curve: [
+      { date: '2024-01-01T00:00:00Z', daily_pnl: 100, cumulative_pnl: 100 },
+      { date: '2024-01-02T00:00:00Z', daily_pnl: -150, cumulative_pnl: -50 },
+      { date: '2024-01-03T00:00:00Z', daily_pnl: 100, cumulative_pnl: 50 },
+      { date: '2024-01-04T00:00:00Z', daily_pnl: -100, cumulative_pnl: -50 },
+      { date: '2024-01-05T00:00:00Z', daily_pnl: 80, cumulative_pnl: 30 },
+    ],
+    statistics: createPerformanceStats({
+      total_trades: 5,
+      wins: 3,
+      losses: 2,
+      win_rate: 60,
+      total_pnl: 30,
+      avg_win: 93.33,
+      avg_loss: -125,
+    }),
+  }
+}

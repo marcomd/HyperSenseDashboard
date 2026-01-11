@@ -1,6 +1,7 @@
-import { Shield, ShieldAlert, ShieldOff, Loader2 } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldOff, Loader2, Info } from 'lucide-react';
 import clsx from 'clsx';
 import type { RiskProfile, RiskProfileName } from '@/types';
+import { Tooltip } from '@/components/common/Tooltip';
 
 interface RiskProfileSelectorProps {
   profile: RiskProfile;
@@ -54,7 +55,41 @@ export function RiskProfileSelector({
   return (
     <div className="card">
       <div className="card-header">
-        <h2 className="text-lg font-semibold text-white">Risk Profile</h2>
+        <div className="flex items-center gap-1.5">
+          <h2 className="text-lg font-semibold text-white">Risk Profile</h2>
+          <Tooltip
+            content={
+              <div className="space-y-2">
+                <p className="font-medium">Risk Profile Settings</p>
+                <div className="space-y-1.5">
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-blue-400 font-medium">Cautious:</span> Conservative trading
+                    with higher confidence thresholds, lower leverage, and tighter risk management.
+                  </p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-slate-400 font-medium">Moderate:</span> Balanced approach
+                    with standard parameters for typical market conditions.
+                  </p>
+                  <p className="text-slate-300 text-xs">
+                    <span className="text-orange-400 font-medium">Fearless:</span> Aggressive trading
+                    with lower confidence thresholds, higher leverage, and wider RSI bands.
+                  </p>
+                </div>
+                <div className="border-t border-slate-600 pt-2 mt-2 space-y-1">
+                  <p className="text-slate-400 text-xs">
+                    Changes take effect immediately for all future trading decisions.
+                  </p>
+                  <p className="text-slate-400 text-xs italic">
+                    Already-open positions are not affected by profile changes.
+                  </p>
+                </div>
+              </div>
+            }
+            position="bottom"
+          >
+            <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 cursor-help" />
+          </Tooltip>
+        </div>
       </div>
       <div className="card-body space-y-4">
         {/* Profile buttons */}

@@ -90,7 +90,11 @@ export function Dashboard() {
             <div className="lg:col-span-2 space-y-6">
               <AccountSummary account={account} />
               <PositionsTable positions={positions} />
-              <EquityCurve data={performanceData} isLoading={perfLoading} />
+              <EquityCurve
+                data={performanceData}
+                isLoading={perfLoading}
+                capitalPnlPercent={account.capital_pnl_percent}
+              />
               <DecisionLog decisions={recent_decisions} />
             </div>
 
