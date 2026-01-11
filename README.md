@@ -1,6 +1,6 @@
 # HyperSense Dashboard
 
-**Version 0.21.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
+**Version 0.22.0** | Real-time trading dashboard for the [HyperSense](https://github.com/marcomd/HyperSense) autonomous AI trading agent.
 
 ![HyperSense_dashboard_cover1.jpg](docs/HyperSense_dashboard_cover1.png)
 
@@ -126,11 +126,11 @@ src/
 | Component              | Description                                                                         |
 | ---------------------- | ----------------------------------------------------------------------------------- |
 | `AccountSummary`       | Open positions, unrealized PnL, margin used, daily P&L, aggregated volatility badge |
-| `RiskProfileSelector`  | Switch between Cautious/Moderate/Fearless trading profiles with parameters display  |
+| `RiskProfileSelector`  | Switch profiles (Cautious/Moderate/Fearless) with parameters including TP zone, trailing stop |
 | `TradingModeSelector`  | Control trading mode (Enabled/Exit Only/Blocked) with circuit breaker integration   |
 | `CostSummaryCard`      | Net P&L, trading fees, LLM costs, server costs breakdown                            |
 | `MarketOverview`      | Current prices, RSI, MACD, EMA signals, forecasts, per-coin volatility with ATR %   |
-| `PositionsTable`      | Open positions with entry, current price, gross/net PnL, SL/TP                      |
+| `PositionsTable`      | Open positions with entry, current price, gross/net PnL, peak tracking, trailing stop, SL/TP |
 | `EquityCurve`         | Cumulative PnL chart with win rate statistics                                       |
 | `MacroStrategyCard`   | Market bias (bullish/bearish/neutral), narrative, key levels                        |
 | `DecisionLog`         | Recent trading decisions with status, volatility, profile badge, model, reasoning   |

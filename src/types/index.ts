@@ -39,6 +39,14 @@ export interface RiskProfileParameters {
   max_position_size: number;
   default_leverage: number;
   max_open_positions: number;
+  // Profit protection settings (profile-specific)
+  tp_zone_pct?: number;
+  profit_drawdown_alert_pct?: number;
+  trailing_stop?: {
+    enabled: boolean;
+    activation_profit_pct: number;
+    trail_distance_pct: number;
+  };
 }
 
 // Risk Profile (user-selectable trading style)
@@ -90,6 +98,20 @@ export interface Position {
   // Decision context (which decisions opened/closed this position)
   opening_decision: DecisionSummary | null;
   closing_decision: DecisionSummary | null;
+  // Peak tracking (for profit protection)
+  peak_price?: number | null;
+  peak_price_at?: string | null;
+  drawdown_from_peak_pct?: number | null;
+  profit_drawdown_from_peak_pct?: number | null;
+  minutes_since_peak?: number | null;
+  // Trailing stop status
+  trailing_stop_active?: boolean;
+  original_stop_loss_price?: number | null;
+  // Distance metrics
+  pct_to_stop_loss?: number | null;
+  pct_to_take_profit?: number | null;
+  is_in_tp_zone?: boolean;
+  position_age_minutes?: number | null;
 }
 
 // Order Summary (embedded in Decision response)

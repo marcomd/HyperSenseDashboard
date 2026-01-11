@@ -1,4 +1,4 @@
-import { ArrowUp, ArrowDown, Shield, Target } from 'lucide-react';
+import { ArrowUp, ArrowDown, Shield, Target, TrendingUp, Activity, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 import type { Position } from '@/types';
 
@@ -39,6 +39,7 @@ export function PositionsTable({ positions, title = 'Open Positions' }: Position
               <th>Entry</th>
               <th>Current</th>
               <th>PnL</th>
+              <th>Peak / Trail</th>
               <th>Leverage</th>
               <th>SL/TP</th>
             </tr>
@@ -57,6 +58,8 @@ export function PositionsTable({ positions, title = 'Open Positions' }: Position
 function PositionRow({ position }: { position: Position }) {
   const isProfitable = (position.unrealized_pnl ?? 0) >= 0;
   const pnlPercent = position.pnl_percent;
+  const profitDrawdown = position.profit_drawdown_from_peak_pct ?? 0;
+  const hasProfitAlert = profitDrawdown > 25;
 
   return (
     <tr className="hover:bg-slate-800/50">
@@ -116,6 +119,53 @@ function PositionRow({ position }: { position: Position }) {
           </span>
         </div>
       </td>
+      {/* Peak / Trailing Stop Column */}
+      <td>
+        <div className="flex flex-col text-xs space-y-1">
+          {/* Peak Tracking */}
+          {position.peak_price && (
+            <div className="flex items-center gap-1 text-blue-400">
+              <TrendingUp className="w-3 h-3" />
+              <span>${position.peak_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              {position.minutes_since_peak !== null && position.minutes_since_peak !== undefined && (
+                <span className="text-slate-500">({position.minutes_since_peak}m)</span>
+              )}
+            </div>
+          )}
+
+          {/* Profit Drawdown Alert */}
+          {hasProfitAlert && (
+            <div className="flex items-center gap-1 text-amber-400">
+              <AlertTriangle className="w-3 h-3" />
+              <span>-{profitDrawdown.toFixed(1)}% from peak</span>
+            </div>
+          )}
+
+          {/* Trailing Stop Status */}
+          <div className={clsx(
+            'flex items-center gap-1',
+            position.trailing_stop_active ? 'text-green-400' : 'text-slate-500'
+          )}>
+            <Activity className="w-3 h-3" />
+            <span>
+              {position.trailing_stop_active ? 'Trailing' : 'Trail: -'}
+            </span>
+          </div>
+
+          {/* TP Zone Indicator */}
+          {position.is_in_tp_zone && (
+            <div className="flex items-center gap-1 text-green-400 font-medium">
+              <Target className="w-3 h-3" />
+              <span>IN TP ZONE</span>
+            </div>
+          )}
+
+          {/* If no peak data yet */}
+          {!position.peak_price && !position.is_in_tp_zone && (
+            <span className="text-slate-500">-</span>
+          )}
+        </div>
+      </td>
       <td className="text-slate-300">
         {position.leverage}x
       </td>
@@ -124,13 +174,19 @@ function PositionRow({ position }: { position: Position }) {
           {position.stop_loss_price && (
             <div className="flex items-center gap-1 text-red-400">
               <Shield className="w-3 h-3" />
-              ${position.stop_loss_price.toLocaleString()}
+              <span>${position.stop_loss_price.toLocaleString()}</span>
+              {position.pct_to_stop_loss !== null && position.pct_to_stop_loss !== undefined && (
+                <span className="text-slate-500">({position.pct_to_stop_loss.toFixed(1)}%)</span>
+              )}
             </div>
           )}
           {position.take_profit_price && (
             <div className="flex items-center gap-1 text-green-400">
               <Target className="w-3 h-3" />
-              ${position.take_profit_price.toLocaleString()}
+              <span>${position.take_profit_price.toLocaleString()}</span>
+              {position.pct_to_take_profit !== null && position.pct_to_take_profit !== undefined && (
+                <span className="text-slate-500">({position.pct_to_take_profit.toFixed(1)}%)</span>
+              )}
             </div>
           )}
           {!position.stop_loss_price && !position.take_profit_price && (

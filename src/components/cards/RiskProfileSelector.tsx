@@ -104,6 +104,25 @@ export function RiskProfileSelector({
             <ParamItem label="RSI High" value={`${params.rsi_overbought}`} />
             <ParamItem label="R/R Min" value={`${params.min_risk_reward_ratio}:1`} />
           </div>
+          {/* Profit Protection Parameters */}
+          <div className="grid grid-cols-3 gap-2 text-xs mt-2">
+            <ParamItem
+              label="TP Zone"
+              value={params.tp_zone_pct ? `${(params.tp_zone_pct * 100).toFixed(1)}%` : '-'}
+            />
+            <ParamItem
+              label="Trail"
+              value={params.trailing_stop?.enabled
+                ? `${(params.trailing_stop.activation_profit_pct * 100).toFixed(1)}%`
+                : 'Off'}
+            />
+            <ParamItem
+              label="Drawdown"
+              value={params.profit_drawdown_alert_pct
+                ? `${(params.profit_drawdown_alert_pct * 100).toFixed(0)}%`
+                : '-'}
+            />
+          </div>
         </div>
       </div>
     </div>

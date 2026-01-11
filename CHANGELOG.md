@@ -5,6 +5,41 @@ All notable changes to the HyperSense Dashboard will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] - 2026-01-11
+
+### Added
+- **Peak Tracking in PositionsTable** - New column displaying position performance tracking
+  - Peak price with time since peak was reached
+  - Profit drawdown alert (amber warning when >25% of profit lost from peak)
+  - Trailing stop status indicator (active/inactive)
+  - TP Zone indicator (green "IN TP ZONE" when position is within take-profit range)
+
+- **Distance Metrics Display** - SL/TP distances now shown as percentages
+  - Stop-loss and take-profit columns show distance percentages (e.g., "5.2% away")
+  - Helps traders quickly assess risk/reward at a glance
+
+- **Position Type Updates** - Extended TypeScript types for position tracking
+  - Added `peak_price`, `peak_price_at`, `drawdown_from_peak_pct`, `profit_drawdown_from_peak_pct`, `minutes_since_peak`
+  - Added `trailing_stop_active`, `original_stop_loss_price`
+  - Added `pct_to_stop_loss`, `pct_to_take_profit`, `is_in_tp_zone`, `position_age_minutes`
+
+- **RiskProfileParameters Extended** - New profit protection settings
+  - Added `tp_zone_pct`, `profit_drawdown_alert_pct` to profile parameters
+  - Added `trailing_stop` object with `enabled`, `activation_profit_pct`, `trail_distance_pct`
+
+### Changed
+- **RiskProfileSelector** - Now displays profit protection parameters
+  - Shows TP Zone percentage threshold
+  - Shows trailing stop activation threshold (or "Off" if disabled)
+  - Shows profit drawdown alert threshold
+  - Third row added to parameters display grid
+
+- **PositionsTable** - Added Peak/Trail column
+  - New column between PnL and Leverage
+  - Uses TrendingUp, Activity, AlertTriangle, and Target icons from Lucide
+
+### Supports Backend (0.41.0)
+
 ## [0.21.0] - 2026-01-11
 
 ### Added
